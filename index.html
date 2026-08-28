@@ -2,14 +2,15 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#09090b">
-    <title>Netcore | ISP Dashboard Mobile</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Netcore | ISP Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
         tailwind.config = {
@@ -31,296 +32,587 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: #060608; color: #f4f4f5; overflow-x: hidden; width: 100vw; margin: 0; padding: 0; }
-        .app-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -10; background: #060608 radial-gradient(circle at 50% 0%, rgba(59,130,246,0.05) 0%, transparent 60%); pointer-events: none; }
-        .fast-glass { background: rgba(18,18,22,0.88); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); }
-        .fast-card { background: rgba(24,24,28,0.94); border: 1px solid rgba(255,255,255,0.06); }
-        .fast-input { background: rgba(9,9,11,0.85); border: 1px solid rgba(255,255,255,0.12); transition: border-color .15s ease; }
-        .fast-input:focus { border-color: #3b82f6; outline: none; }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #09090b; 
+            color: #f4f4f5; 
+            overscroll-behavior-y: none; 
+            overflow-x: hidden; 
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -10;
+            background: #09090b radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            transform: translateZ(0);
+        }
+
+        .fast-glass { 
+            background: rgba(18, 18, 22, 0.88); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        .fast-card { 
+            background: rgba(24, 24, 28, 0.94); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            transform: translateZ(0);
+            contain: content;
+        }
+
+        .fast-input { 
+            background: rgba(9, 9, 11, 0.85); 
+            border: 1px solid rgba(255, 255, 255, 0.12); 
+            transition: border-color 0.15s ease; 
+        }
+        .fast-input:focus { 
+            border-color: #3b82f6; 
+            outline: none; 
+        }
+
+        .smooth-scroll {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        .toast-enter { transform: translateY(0); opacity: 1; transition: all .25s ease-out; }
-        .toast-exit { transform: translateY(-20px); opacity: 0; transition: all .2s ease-in; }
-        .sidebar-menu-btn { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #a1a1aa; border-radius: 12px; transition: all .2s; font-weight: 600; font-size: 14px; cursor: pointer; }
-        .sidebar-menu-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .sidebar-menu-btn.active { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #09090b; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+        
+        .toast-enter { transform: translateY(0); opacity: 1; transition: all 0.25s ease-out; }
+        .toast-exit { transform: translateY(-20px); opacity: 0; transition: all 0.2s ease-in; }
+        
+        .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 110px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+        .nav-safe { padding-bottom: calc(env(safe-area-inset-bottom, 12px) + 6px); }
+
+        .node-item-card {
+            content-visibility: auto;
+            contain-intrinsic-size: 0 170px;
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-brand-500 selection:text-white">
 
     <div class="app-bg"></div>
-    <div id="toastContainer" class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none w-auto min-w-[300px]"></div>
+    <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none w-[90%] max-w-sm"></div>
 
-    <!-- Login Page -->
+    <!-- Halaman Login -->
     <div id="loginPage" class="min-h-screen flex items-center justify-center p-5 w-full relative">
-        <div class="fast-glass p-10 rounded-3xl w-full max-w-lg shadow-2xl relative border border-white/10">
-            <div class="text-center mb-10">
-                <div class="w-20 h-20 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-neon-blue mb-5">
-                    <i class="fa-solid fa-fingerprint text-4xl text-white"></i>
+        <div class="fast-glass p-8 md:p-10 rounded-3xl w-full max-w-md shadow-2xl relative border border-white/10">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-neon-blue mb-4">
+                    <i class="fa-solid fa-fingerprint text-3xl text-white"></i>
                 </div>
-                <h2 class="text-3xl font-black tracking-tight text-white">NETCORE</h2>
-                <p class="text-xs font-medium text-zinc-400 tracking-widest uppercase mt-2">Professional Monitor Dashboard</p>
+                <h2 class="text-2xl font-black tracking-tight text-white">NETCORE</h2>
+                <p class="text-[10px] font-medium text-zinc-400 tracking-widest uppercase mt-0.5">High Performance ISP Portal</p>
             </div>
             
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-zinc-400">Email Administrator</label>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-zinc-400">Email ID</label>
                     <div class="relative">
-                        <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-base"></i>
-                        <input type="email" id="loginEmail" required placeholder="admin@netcore.co.id" class="w-full fast-input rounded-xl py-4 pl-12 pr-4 text-base text-white placeholder-zinc-600">
+                        <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+                        <input type="email" id="loginEmail" required placeholder="admin@netcore.co.id" class="w-full fast-input rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-600">
                     </div>
                 </div>
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-zinc-400">Security Password</label>
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-zinc-400">Password</label>
                     <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-base"></i>
-                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full fast-input rounded-xl py-4 pl-12 pr-4 text-base text-white placeholder-zinc-600">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full fast-input rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-600">
                     </div>
                 </div>
                 
-                <div id="loginError" class="hidden bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl text-center font-medium"></div>
+                <div id="loginError" class="hidden bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-3 rounded-xl text-center font-medium"></div>
                 
-                <button type="submit" id="loginBtn" class="w-full bg-white text-dark-950 hover:bg-zinc-200 active:scale-[0.98] font-bold py-4 rounded-xl transition shadow-lg flex items-center justify-center gap-2 mt-6 text-base">
-                    <span>Authentikasi Sistem</span><i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>
+                <button type="submit" id="loginBtn" class="w-full bg-white text-dark-950 hover:bg-zinc-200 active:scale-[0.98] font-bold py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 mt-4 text-sm">
+                    <span>Authenticate</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Dashboard Layout -->
-    <div id="dashboardPage" class="hidden min-h-screen w-full flex">
-        <!-- Sidebar -->
-        <aside class="w-72 h-screen fast-glass border-r border-white/5 sticky top-0 flex flex-col z-40 hidden md:flex">
-            <div class="p-6 border-b border-white/5 flex items-center gap-4">
-                <div class="w-10 h-10 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-neon-blue">
-                    <i class="fa-solid fa-globe text-white text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-black tracking-tight text-white leading-none mb-1">NETCORE</h1>
-                    <span class="text-zinc-400 text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-accent-500 animate-pulse"></span> Online</span>
-                </div>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-4 space-y-2">
-                <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-wider mb-3 px-4 mt-2">Main Menu</div>
-                <div onclick="window.scrollTo({top:0,behavior:'smooth'})" class="sidebar-menu-btn active"><i class="fa-solid fa-chart-pie w-5 text-center"></i> <span>Dashboard Overview</span></div>
-                <div onclick="toggleModal('inputModal')" class="sidebar-menu-btn"><i class="fa-solid fa-server w-5 text-center"></i> <span>Registrasi Node</span></div>
-                <div onclick="toggleEwoModal()" class="sidebar-menu-btn"><i class="fa-solid fa-file-signature w-5 text-center text-amber-400"></i> <span>Work Order (EWO)</span></div>
-                <div onclick="toggleModal('otdrModal')" class="sidebar-menu-btn"><i class="fa-solid fa-chart-area w-5 text-center text-purple-400"></i> <span>OTDR Manager</span></div>
-                <div onclick="toggleModal('mapModal')" class="sidebar-menu-btn"><i class="fa-solid fa-map-location-dot w-5 text-center text-emerald-400"></i> <span>Peta Jaringan (Live)</span></div>
-                <div onclick="toggleModal('sorBatchModal')" class="sidebar-menu-btn"><i class="fa-solid fa-file-waveform w-5 text-center text-pink-400"></i> <span>SOR Reader Extractor</span></div>
-                
-                <div id="adminMenuSection" class="hidden">
-                    <div class="text-[10px] font-bold text-zinc-600 uppercase tracking-wider mb-3 px-4 mt-6">Administrator</div>
-                    <div onclick="toggleTrackerModal()" class="sidebar-menu-btn"><i class="fa-solid fa-location-crosshairs w-5 text-center text-accent-400"></i> <span>Team GPS Tracker</span></div>
-                    <div onclick="toggleActivityModal()" class="sidebar-menu-btn"><i class="fa-solid fa-clock-rotate-left w-5 text-center text-brand-400"></i> <span>Activity Logs</span></div>
-                </div>
-            </div>
-            
-            <div class="p-4 border-t border-white/5">
-                <div class="flex items-center justify-between px-2 mb-4">
-                    <span id="ownerRoleBadge" class="hidden px-2 py-1 text-[10px] font-black bg-amber-400/20 border border-amber-400/50 text-amber-400 rounded tracking-wider">OWNER</span>
-                </div>
-                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 py-3 rounded-xl font-bold text-sm transition"><i class="fa-solid fa-power-off text-sm"></i> Logout System</button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 min-h-screen relative overflow-x-hidden flex flex-col">
-            <header class="w-full px-8 py-5 flex justify-between items-center bg-dark-900/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-30">
-                <h2 class="text-xl font-bold text-white tracking-wide">Network Dashboard</h2>
-                <button onclick="refreshDashboardStats()" class="flex items-center gap-2 bg-dark-800 hover:bg-dark-700 border border-zinc-700 text-zinc-300 px-4 py-2 rounded-lg font-semibold text-sm transition"><i id="syncIcon" class="fa-solid fa-rotate-right"></i> Sinkronisasi Data</button>
-            </header>
-            
-            <div class="p-8 w-full max-w-[1600px] mx-auto space-y-8 pb-20">
-                <div id="summaryCards" class="grid grid-cols-2 lg:grid-cols-4 gap-5 w-full"></div>
-                
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
-                    <div class="fast-card p-6 rounded-2xl relative overflow-hidden">
-                        <h3 class="text-white text-sm font-bold tracking-wide flex items-center mb-5"><div class="w-8 h-8 rounded-lg bg-brand-500/20 flex items-center justify-center mr-3 border border-brand-500/30"><i class="fa-solid fa-chart-pie text-brand-400"></i></div>Distribusi Node per Lokasi</h3>
-                        <div class="relative w-full h-[280px] flex justify-center items-center"><canvas id="chartLokasi"></canvas></div>
+    <!-- Halaman Dashboard -->
+    <div id="dashboardPage" class="hidden min-h-screen relative w-full max-w-[1400px] mx-auto pb-safe">
+        
+        <!-- Header -->
+        <header class="sticky top-0 z-40 pt-safe fast-glass border-b border-white/10 shadow-lg mb-4 w-full">
+            <div class="flex justify-between items-center px-4 py-3.5">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-full flex items-center justify-center shadow-neon-blue">
+                        <i class="fa-solid fa-globe text-white text-xs"></i>
                     </div>
-                    <div class="fast-card p-6 rounded-2xl relative overflow-hidden">
-                        <h3 class="text-white text-sm font-bold tracking-wide flex items-center mb-5"><div class="w-8 h-8 rounded-lg bg-accent-500/20 flex items-center justify-center mr-3 border border-accent-500/30"><i class="fa-solid fa-chart-simple text-accent-400"></i></div>Total Port Aktif per Lokasi</h3>
-                        <div class="relative w-full h-[280px]"><canvas id="chartPort"></canvas></div>
-                    </div>
-                    <div class="fast-card p-6 rounded-2xl relative overflow-hidden">
-                        <h3 class="text-white text-sm font-bold tracking-wide flex items-center mb-5"><div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center mr-3 border border-indigo-500/30"><i class="fa-solid fa-chart-line text-indigo-400"></i></div>Statistik Penggunaan Global</h3>
-                        <div class="relative w-full h-[280px] flex justify-center items-center"><canvas id="chartOverall"></canvas></div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full">
-                    <div class="xl:col-span-2 fast-card p-6 rounded-2xl relative overflow-hidden flex flex-col">
-                        <div class="flex flex-row items-center justify-between mb-5">
-                            <h3 class="text-white text-sm font-bold tracking-wide flex items-center"><div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center mr-3 border border-purple-500/30"><i class="fa-solid fa-network-wired text-purple-400"></i></div>System Detail Overview</h3>
+                    <div>
+                        <h1 class="text-base font-bold tracking-tight text-white leading-none mb-1">Netcore ISP</h1>
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"></span>
+                            <span class="text-zinc-400 text-[9px] font-medium tracking-wider uppercase leading-none">Medan Network</span>
+                            <span id="ownerRoleBadge" class="hidden px-1.5 py-0.5 text-[8px] font-black bg-amber-400 text-black rounded tracking-wider">OWNER</span>
                         </div>
-                        <div id="detailedStats" class="grid grid-cols-3 gap-4 text-sm w-full mb-6">
-                            <div class="bg-dark-800/60 h-20 rounded-xl border border-zinc-700/30 animate-pulse"></div>
-                            <div class="bg-dark-800/60 h-20 rounded-xl border border-zinc-700/30 animate-pulse"></div>
-                            <div class="bg-dark-800/60 h-20 rounded-xl border border-zinc-700/30 animate-pulse"></div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button id="btnTeamTracker" onclick="openTrackerModal()" class="hidden w-9 h-9 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center active:scale-95 transition" title="Team Location Tracker">
+                        <i class="fa-solid fa-location-crosshairs text-xs"></i>
+                    </button>
+                    <button id="btnActivityLog" onclick="openActivityLogModal()" class="hidden w-9 h-9 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center active:scale-95 transition" title="Activity Logs">
+                        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                    </button>
+                    <button onclick="refreshDashboardStats()" class="w-9 h-9 rounded-full bg-dark-800 border border-zinc-700/60 text-zinc-300 flex items-center justify-center active:scale-95 transition">
+                        <i id="syncIcon" class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                    <button onclick="handleLogout()" class="flex items-center gap-1.5 bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-full font-medium text-xs active:scale-95 transition">
+                        <i class="fa-solid fa-power-off text-xs"></i> <span class="hidden md:inline">Keluar</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="px-4 md:px-8 w-full space-y-5"> 
+            
+            <div id="summaryCards" class="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full"></div>
+
+            <div class="w-full">
+                <div class="fast-card p-4 md:p-5 rounded-2xl relative overflow-hidden">
+                    <div class="flex flex-row items-center justify-between mb-4 cursor-pointer" onclick="toggleRecapDropdown()">
+                        <h3 class="text-white text-xs md:text-sm font-bold tracking-wide flex items-center">
+                            <div class="w-7 h-7 rounded-lg bg-brand-500/20 flex items-center justify-center mr-2.5 border border-brand-500/30">
+                                <i class="fa-solid fa-chart-column text-brand-400 text-xs"></i>
+                            </div>
+                            System Overview
+                        </h3>
+                        <div class="flex items-center gap-1.5 text-[10px] text-zinc-400 bg-dark-900 px-2.5 py-1 rounded-full border border-zinc-700/50">
+                            <span>Detail</span><i id="recapChevron" class="fa-solid fa-chevron-up text-[9px] transition-transform duration-200"></i>
                         </div>
-                        <div id="recapDropdownPanel" class="flex-1 w-full border-t border-zinc-800/80 pt-5"></div>
                     </div>
                     
-                    <div class="xl:col-span-1 fast-card p-6 rounded-2xl relative overflow-hidden">
-                        <h3 class="text-white text-sm font-bold tracking-wide flex items-center mb-5"><div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center mr-3 border border-orange-500/30"><i class="fa-solid fa-database text-orange-400"></i></div>Akses Database Cepat</h3>
-                        <div class="flex flex-col gap-3">
-                            <button onclick="openDatabaseModal('All')" class="w-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:opacity-90 active:scale-[0.98] text-white p-5 rounded-xl font-bold transition shadow-neon-blue flex items-center justify-between">
-                                <div class="flex items-center gap-3"><i class="fa-solid fa-layer-group text-xl"></i> <span class="text-sm">Buka Semua Database</span></div><i class="fa-solid fa-arrow-right"></i>
-                            </button>
-                            <div class="grid grid-cols-2 gap-3 mt-2">
-                                <button onclick="openDatabaseModal('OLT')" class="bg-dark-800 hover:bg-dark-700 border border-zinc-700 active:scale-[0.98] text-white p-4 rounded-xl transition flex flex-col gap-2"><i class="fa-solid fa-server text-purple-400 text-lg"></i><span class="text-xs font-bold text-left">Data OLT</span></button>
-                                <button onclick="openDatabaseModal('Switch')" class="bg-dark-800 hover:bg-dark-700 border border-zinc-700 active:scale-[0.98] text-white p-4 rounded-xl transition flex flex-col gap-2"><i class="fa-solid fa-random text-blue-400 text-lg"></i><span class="text-xs font-bold text-left">Data Switch</span></button>
-                                <button onclick="openDatabaseModal('Backbone')" class="bg-dark-800 hover:bg-dark-700 border border-zinc-700 active:scale-[0.98] text-white p-4 rounded-xl transition flex flex-col gap-2"><i class="fa-solid fa-route text-orange-400 text-lg"></i><span class="text-xs font-bold text-left">Data Backbone</span></button>
-                                <button onclick="openDatabaseModal('All')" class="bg-dark-800 hover:bg-dark-700 border border-zinc-700 active:scale-[0.98] text-zinc-400 p-4 rounded-xl transition flex flex-col justify-center items-center text-center gap-2"><i class="fa-solid fa-ellipsis text-lg"></i><span class="text-[10px] font-semibold uppercase tracking-wider">Lainnya</span></button>
-                            </div>
-                        </div>
+                    <div id="detailedStats" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs md:text-sm w-full">
+                        <div class="bg-dark-800/60 h-14 rounded-xl border border-zinc-700/30 animate-pulse"></div>
+                        <div class="bg-dark-800/60 h-14 rounded-xl border border-zinc-700/30 animate-pulse"></div>
+                        <div class="bg-dark-800/60 h-14 rounded-xl border border-zinc-700/30 animate-pulse"></div>
                     </div>
+                    
+                    <div id="recapDropdownPanel" class="mt-4 pt-4 border-t border-zinc-800/80 w-full hidden"></div>
+                </div>
+            </div>
+
+            <div class="w-full">
+                <h3 class="text-white text-xs md:text-sm font-bold tracking-wide mb-3 pl-0.5">Database Modules</h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                    <button onclick="openDatabaseModal('All')" class="col-span-2 md:col-span-1 bg-gradient-to-br from-brand-500 to-indigo-600 active:scale-95 text-white p-4 rounded-2xl font-bold transition shadow-neon-blue flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center shrink-0"><i class="fa-solid fa-layer-group text-lg"></i></div>
+                        <div class="text-left"><span class="block text-sm">All Nodes</span><span class="text-[9px] text-white/70 font-normal">Full Database</span></div>
+                    </button>
+                    
+                    <button onclick="openDatabaseModal('OLT')" class="fast-card hover:bg-zinc-800 active:scale-95 text-white p-3.5 rounded-2xl transition flex flex-col justify-between gap-2.5 text-left">
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center border border-purple-500/30"><i class="fa-solid fa-server text-purple-400 text-xs"></i></div>
+                        <div><span class="block text-xs font-bold">Data OLT</span><span class="text-[9px] text-zinc-500">Optical Terminals</span></div>
+                    </button>
+                    
+                    <button onclick="openDatabaseModal('Switch')" class="fast-card hover:bg-zinc-800 active:scale-95 text-white p-3.5 rounded-2xl transition flex flex-col justify-between gap-2.5 text-left">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center border border-blue-500/30"><i class="fa-solid fa-random text-blue-400 text-xs"></i></div>
+                        <div><span class="block text-xs font-bold">Data Switch</span><span class="text-[9px] text-zinc-500">Network Switches</span></div>
+                    </button>
+                    
+                    <button onclick="openDatabaseModal('Backbone')" class="fast-card hover:bg-zinc-800 active:scale-95 text-white p-3.5 rounded-2xl transition flex flex-col justify-between gap-2.5 text-left">
+                        <div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center border border-orange-500/30"><i class="fa-solid fa-route text-orange-400 text-xs"></i></div>
+                        <div><span class="block text-xs font-bold">Backbone</span><span class="text-[9px] text-zinc-500">Core Routes</span></div>
+                    </button>
+
+                    <button onclick="openMapModal()" class="fast-card hover:bg-zinc-800 active:scale-95 text-white p-3.5 rounded-2xl transition flex flex-col justify-between gap-2.5 text-left">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30"><i class="fa-solid fa-map-location-dot text-emerald-400 text-xs"></i></div>
+                        <div><span class="block text-xs font-bold">Peta Backbone</span><span class="text-[9px] text-zinc-500">Live Map BBDM</span></div>
+                    </button>
+
+                    <button onclick="openSorBatchModal()" class="fast-card hover:bg-zinc-800 active:scale-95 text-white p-3.5 rounded-2xl transition flex flex-col justify-between gap-2.5 text-left border border-pink-500/20">
+                        <div class="w-8 h-8 rounded-lg bg-pink-500/20 flex items-center justify-center border border-pink-500/30"><i class="fa-solid fa-file-waveform text-pink-400 text-xs"></i></div>
+                        <div><span class="block text-xs font-bold text-pink-400">SOR Reader</span><span class="text-[9px] text-zinc-500">Advanced Extraction</span></div>
+                    </button>
                 </div>
             </div>
         </main>
+
+        <!-- Bottom Navigation Bar Mobile -->
+        <nav class="fixed bottom-0 left-0 right-0 z-[90] nav-safe pt-2 md:hidden">
+            <div class="mx-3 bg-dark-900/95 border border-white/10 shadow-2xl rounded-2xl p-1 flex justify-between items-center">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center w-1/4 py-2 text-brand-400 active:scale-90 transition">
+                    <i class="fa-solid fa-house mb-0.5 text-base"></i><span class="text-[9px] font-semibold">Home</span>
+                </button>
+                <button onclick="toggleInputModal()" class="flex flex-col items-center justify-center w-1/4 py-2 text-zinc-400 active:scale-90 transition">
+                    <i class="fa-solid fa-square-plus mb-0.5 text-base"></i><span class="text-[9px] font-medium">Add Node</span>
+                </button>
+                <button onclick="toggleEWOModal()" class="flex flex-col items-center justify-center w-1/4 py-2 text-zinc-400 active:scale-90 transition">
+                    <i class="fa-solid fa-file-signature mb-0.5 text-base"></i><span class="text-[9px] font-medium">EWO</span>
+                </button>
+                <button onclick="toggleOTDRModal()" class="flex flex-col items-center justify-center w-1/4 py-2 text-zinc-400 active:scale-90 transition">
+                    <i class="fa-solid fa-chart-area mb-0.5 text-base"></i><span class="text-[9px] font-medium">OTDR</span>
+                </button>
+            </div>
+        </nav>
     </div>
 
-    <!-- SEMUA MODALS DI BAWAH SINI -->
-    
-    <!-- Modal Database -->
-    <div id="databaseModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-6">
-        <div id="databaseModalContent" class="bg-dark-900 w-full max-w-[1400px] h-[90vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-5 border-b border-zinc-800 flex justify-between items-center bg-dark-950 rounded-t-2xl">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center border border-brand-500/30"><i class="fa-solid fa-database text-brand-400 text-lg"></i></div>
-                    <h3 class="text-white text-lg font-bold">Database Node Explorer</h3>
+    <!-- SEMUA MODAL -->
+    <!-- Modal Database Table -->
+    <div id="databaseModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="databaseModalContent" class="bg-dark-900 w-full md:w-[95%] md:max-w-[1300px] md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col h-[90vh] transition-transform duration-200 transform translate-y-full">
+            <div class="w-full flex justify-center pt-2.5 pb-1.5 md:hidden"><div class="w-10 h-1 bg-zinc-700 rounded-full"></div></div>
+            
+            <div class="px-4 py-3 border-b border-zinc-800/80 flex justify-between items-center bg-dark-900 sticky top-0 z-20">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-brand-500/20 flex items-center justify-center border border-brand-500/30">
+                        <i class="fa-solid fa-database text-brand-400 text-xs"></i>
+                    </div>
+                    <h3 id="databaseModalTitle" class="text-white text-sm font-bold">Database Node Explorer</h3>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div id="serverLoadingIndicator" class="hidden text-xs text-brand-400 font-bold animate-pulse flex items-center gap-2 bg-brand-500/10 px-4 py-1.5 rounded-full"><i class="fa-solid fa-circle-notch fa-spin"></i> Sinkronisasi Server...</div>
-                    <button onclick="toggleModal('databaseModal')" class="w-10 h-10 bg-dark-800 hover:bg-red-500/20 hover:text-red-400 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+                
+                <div class="flex items-center gap-2">
+                    <div id="serverLoadingIndicator" class="hidden text-[10px] text-brand-400 font-bold animate-pulse flex items-center gap-1 bg-brand-500/10 px-2 py-0.5 rounded-full">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Sync
+                    </div>
+                    <button id="btnExportDbXlsx" onclick="exportTableToExcelTemplate('xlsx')" class="hidden text-[10px] bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-semibold active:scale-95 transition">
+                        <i class="fa-solid fa-file-excel mr-1"></i> Excel
+                    </button>
+                    <button id="btnExportDbCsv" onclick="exportTableToExcelTemplate('csv')" class="hidden text-[10px] bg-dark-800 text-zinc-300 border border-zinc-700 px-2.5 py-1 rounded-lg font-medium active:scale-95 transition">
+                        CSV
+                    </button>
+                    <button onclick="closeDatabaseModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400 active:scale-90 transition">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
                 </div>
             </div>
-            <div class="p-6 overflow-hidden flex-1 flex flex-col gap-5">
-                <div class="flex flex-row justify-between gap-4">
-                    <div class="flex bg-dark-800 p-1.5 rounded-xl border border-zinc-700 h-fit">
-                        <button id="modal-btn-All" onclick="setModalFilter('All')" class="modal-filter-btn px-6 py-2 rounded-lg text-sm font-semibold transition bg-brand-500 text-white shadow-neon-blue">All Nodes</button>
-                        <button id="modal-btn-OLT" onclick="setModalFilter('OLT')" class="modal-filter-btn px-6 py-2 rounded-lg text-sm font-semibold text-zinc-400 hover:text-white transition">OLT</button>
-                        <button id="modal-btn-Switch" onclick="setModalFilter('Switch')" class="modal-filter-btn px-6 py-2 rounded-lg text-sm font-semibold text-zinc-400 hover:text-white transition">Switch</button>
-                        <button id="modal-btn-Backbone" onclick="setModalFilter('Backbone')" class="modal-filter-btn px-6 py-2 rounded-lg text-sm font-semibold text-zinc-400 hover:text-white transition">Backbone</button>
-                    </div>
-                    <div class="grid grid-cols-4 gap-3 flex-1 max-w-[800px]">
-                        <div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i><input type="text" id="searchNama" oninput="triggerSearch()" placeholder="Cari Device..." class="w-full fast-input rounded-xl pl-10 p-2.5 text-sm text-white"></div>
-                        <div class="relative"><i class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i><input type="text" id="searchLokasi" oninput="triggerSearch()" placeholder="Lokasi POP..." class="w-full fast-input rounded-xl pl-10 p-2.5 text-sm text-white"></div>
-                        <div class="relative"><i class="fa-solid fa-ethernet absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i><input type="text" id="searchPort" oninput="triggerSearch()" placeholder="Port/PON..." class="w-full fast-input rounded-xl pl-10 p-2.5 text-sm text-white"></div>
-                        <div class="relative"><i class="fa-solid fa-barcode absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i><input type="text" id="searchOtb" oninput="triggerSearch()" placeholder="Kode OTB..." class="w-full fast-input rounded-xl pl-10 p-2.5 text-sm text-white"></div>
-                    </div>
+            
+            <div class="p-3 md:p-4 overflow-hidden flex-1 flex flex-col gap-3">
+                <div class="flex flex-nowrap overflow-x-auto scrollbar-hide gap-1.5 pb-1 shrink-0">
+                    <button id="modal-btn-All" onclick="setModalFilter('All')" class="modal-filter-btn shrink-0 bg-brand-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold">All Nodes</button>
+                    <button id="modal-btn-OLT" onclick="setModalFilter('OLT')" class="modal-filter-btn shrink-0 bg-dark-800 text-zinc-400 border border-zinc-700 px-3 py-1.5 rounded-full text-xs font-semibold">OLT</button>
+                    <button id="modal-btn-Switch" onclick="setModalFilter('Switch')" class="modal-filter-btn shrink-0 bg-dark-800 text-zinc-400 border border-zinc-700 px-3 py-1.5 rounded-full text-xs font-semibold">Switch</button>
+                    <button id="modal-btn-Backbone" onclick="setModalFilter('Backbone')" class="modal-filter-btn shrink-0 bg-dark-800 text-zinc-400 border border-zinc-700 px-3 py-1.5 rounded-full text-xs font-semibold">Backbone</button>
                 </div>
-                <div class="rounded-2xl relative flex-1 bg-dark-950 border border-zinc-800 p-4 overflow-hidden">
-                    <div id="data-list-container" class="w-full h-full overflow-y-auto space-y-3 lg:grid lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-4 lg:space-y-0 content-start pr-2"></div>
-                    <div id="emptyState" class="hidden absolute inset-0 flex flex-col items-center justify-center p-10 text-center text-zinc-500">
-                        <i class="fa-solid fa-folder-open text-5xl mb-4 opacity-30 text-brand-400"></i><h4 class="text-lg font-bold text-zinc-400">Data Tidak Ditemukan</h4><p class="text-sm mt-1">Coba ubah kata kunci pencarian Anda.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 shrink-0">
+                    <div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-[10px]"></i><input type="text" id="searchNama" oninput="triggerServerSearch()" placeholder="Search Device..." class="w-full fast-input rounded-xl pl-7 p-2 text-xs text-white placeholder-zinc-600"></div>
+                    <div class="relative"><i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-[10px]"></i><input type="text" id="searchLokasi" oninput="triggerServerSearch()" placeholder="Location..." class="w-full fast-input rounded-xl pl-7 p-2 text-xs text-white placeholder-zinc-600"></div>
+                    <div class="relative"><i class="fa-solid fa-ethernet absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-[10px]"></i><input type="text" id="searchPort" oninput="triggerServerSearch()" placeholder="Port..." class="w-full fast-input rounded-xl pl-7 p-2 text-xs text-white placeholder-zinc-600"></div>
+                    <div class="relative"><i class="fa-solid fa-barcode absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-[10px]"></i><input type="text" id="searchOtb" oninput="triggerServerSearch()" placeholder="OTB..." class="w-full fast-input rounded-xl pl-7 p-2 text-xs text-white placeholder-zinc-600"></div>
+                </div>
+                
+                <div class="rounded-2xl relative flex-1 bg-dark-950/60 border border-zinc-800/80 p-2 overflow-hidden">
+                    <div id="data-list-container" class="w-full h-full overflow-y-auto space-y-2.5 scrollbar-hide smooth-scroll md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-3 md:space-y-0 content-start pb-6"></div>
+                    <div id="emptyState" class="hidden absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-zinc-500">
+                        <i class="fa-solid fa-ghost text-3xl mb-2 opacity-40 text-brand-400"></i>
+                        <h4 class="text-xs font-bold text-zinc-400">No Records Match</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Input Node -->
-    <div id="inputModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-4">
-        <div id="inputModalContent" class="bg-dark-900 w-full max-w-2xl rounded-2xl border border-zinc-700 shadow-2xl flex flex-col max-h-[90vh] transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-4 flex justify-between items-center border-b border-zinc-800 bg-dark-950 rounded-t-2xl">
-                <h3 class="text-white text-base font-bold flex items-center gap-2"><div class="w-8 h-8 rounded bg-accent-500/20 flex items-center justify-center border border-accent-500/30"><i class="fa-solid fa-server text-accent-400 text-sm"></i></div> Registrasi Node Baru</h3>
-                <button onclick="toggleModal('inputModal')" class="w-8 h-8 bg-dark-800 hover:bg-zinc-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Modal Form Node Registrasi -->
+    <div id="inputModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="inputModalContent" class="bg-dark-900 w-full md:max-w-lg md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col max-h-[92vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-5 py-3.5 flex justify-between items-center border-b border-zinc-800">
+                <h3 class="text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-server text-accent-400 text-xs"></i> Register Node</h3>
+                <button onclick="toggleInputModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
-            <div class="p-6 overflow-y-auto">
-                <form id="manualInputForm" onsubmit="handleInputData(event)" class="space-y-5">
-                    <div class="space-y-2"><label class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Nama Perangkat</label><input type="text" id="inputNama" required class="w-full fast-input rounded-xl p-3.5 text-sm text-white" placeholder="Contoh: OLT-ZTE-MDN-01"></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2"><label class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Tipe Sistem</label><select id="inputTipe" required class="w-full fast-input rounded-xl p-3.5 text-sm text-white"><option value="OLT">OLT</option><option value="Switch">Switch</option><option value="Backbone">Backbone</option></select></div>
-                        <div class="space-y-2"><label class="text-xs text-zinc-400 uppercase font-bold tracking-wider">IP Address</label><input type="text" id="inputIp" class="w-full fast-input rounded-xl p-3.5 text-sm text-white" placeholder="10.x.x.x"></div>
+            <div class="p-5 overflow-y-auto scrollbar-hide flex-1">
+                <form id="manualInputForm" onsubmit="handleInputData(event)" class="space-y-3">
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Device Name</label><input type="text" id="inputNama" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white" placeholder="e.g. OLT-ZTE-MDN-01"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Type</label><select id="inputTipe" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"><option value="OLT">OLT</option><option value="Switch">Switch</option><option value="Backbone">Backbone</option></select></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">IP Address</label><input type="text" id="inputIp" class="w-full fast-input rounded-xl p-2.5 text-xs text-white" placeholder="10.x.x.x"></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2"><label class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Lokasi / POP Area</label><input type="text" id="inputLokasi" required class="w-full fast-input rounded-xl p-3.5 text-sm text-white" placeholder="Nama POP"></div>
-                        <div class="space-y-2"><label class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Status Awal</label><select id="inputStatus" required class="w-full fast-input rounded-xl p-3.5 text-sm text-white"><option value="Online">Online (Normal)</option><option value="Warning">Warning (Gangguan)</option><option value="Offline">Offline (Mati)</option></select></div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Location</label><input type="text" id="inputLokasi" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white" placeholder="POP Area"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold flex items-center justify-between"><span>Port Info</span><span class="text-[8px] text-brand-400 font-normal">Pisah Enter/Koma</span></label><textarea id="inputPort" rows="3" class="w-full fast-input rounded-xl p-2.5 text-xs text-white leading-relaxed resize-none font-mono" placeholder="PON 1&#10;PON 2&#10;PON 3..."></textarea></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold flex items-center justify-between"><span>OTB Code</span><span class="text-[8px] text-purple-400 font-normal">Pisah Enter/Koma</span></label><textarea id="inputOtb" rows="3" class="w-full fast-input rounded-xl p-2.5 text-xs text-white leading-relaxed resize-none font-mono" placeholder="OTB-01&#10;OTB-02&#10;OTB-03..."></textarea></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2"><label class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Detail Port (Pisah Enter)</label><textarea id="inputPort" rows="4" class="w-full fast-input rounded-xl p-3.5 text-sm text-white font-mono" placeholder="PON 1&#10;PON 2"></textarea></div>
-                        <div class="space-y-2"><label class="text-xs text-zinc-400 uppercase font-bold tracking-wider">Kode OTB (Pisah Enter)</label><textarea id="inputOtb" rows="4" class="w-full fast-input rounded-xl p-3.5 text-sm text-white font-mono" placeholder="OTB-01&#10;OTB-02"></textarea></div>
-                    </div>
-                    <div class="pt-4 border-t border-zinc-800"><button type="submit" id="submitInputBtn" class="w-full bg-accent-500 hover:bg-accent-600 text-dark-950 font-black py-4 rounded-xl transition shadow-neon-green flex items-center justify-center gap-2"><i class="fa-solid fa-cloud-arrow-up"></i> Simpan ke Database Utama</button></div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Initial Status</label><select id="inputStatus" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"><option value="Online">Online</option><option value="Offline">Offline</option><option value="Warning">Warning</option></select></div>
+                    <div class="pt-2"><button type="submit" id="submitInputBtn" class="w-full bg-accent-500 text-dark-950 font-bold py-3 rounded-xl active:scale-95 transition text-xs flex items-center justify-center gap-1.5"><i class="fa-solid fa-cloud-arrow-up"></i> Save Node</button></div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal EWO -->
-    <div id="ewoModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-4">
-        <div id="ewoModalContent" class="bg-dark-900 w-full max-w-4xl h-[85vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-4 flex justify-between items-center border-b border-zinc-800 bg-dark-950 rounded-t-2xl">
-                <h3 class="text-white text-base font-bold flex items-center gap-2"><div class="w-8 h-8 rounded bg-amber-500/20 flex items-center justify-center border border-amber-500/30"><i class="fa-solid fa-file-signature text-amber-400 text-sm"></i></div> Work Order (EWO)</h3>
-                <button onclick="toggleModal('ewoModal')" class="w-8 h-8 bg-dark-800 hover:bg-zinc-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Modal EWO Work Order -->
+    <div id="ewoModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="ewoModalContent" class="bg-dark-900 w-full md:max-w-lg md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col max-h-[90vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-4 py-3 flex justify-between items-center border-b border-zinc-800">
+                <h3 class="text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-file-signature text-amber-400 text-xs"></i> Work Order (EWO)</h3>
+                <div class="flex items-center gap-2">
+                    <button id="btnExportEwoXlsx" onclick="exportEWOToExcel('xlsx')" class="hidden text-[10px] bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-semibold active:scale-95 transition">Export</button>
+                    <button onclick="toggleEWOModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400"><i class="fa-solid fa-xmark text-sm"></i></button>
+                </div>
             </div>
-            <div class="p-6 overflow-y-auto flex-1 text-center text-zinc-400" id="ewoListContainer">
-                <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3 mt-10"></i><p>Memuat Data EWO...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Activity Logs -->
-    <div id="activityModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-4">
-        <div id="activityModalContent" class="bg-dark-900 w-full max-w-4xl h-[85vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-4 flex justify-between items-center border-b border-zinc-800 bg-dark-950 rounded-t-2xl">
-                <h3 class="text-white text-base font-bold flex items-center gap-2"><div class="w-8 h-8 rounded bg-brand-500/20 flex items-center justify-center border border-brand-500/30"><i class="fa-solid fa-clock-rotate-left text-brand-400 text-sm"></i></div> Activity Logs</h3>
-                <button onclick="toggleModal('activityModal')" class="w-8 h-8 bg-dark-800 hover:bg-zinc-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 space-y-3" id="activityListContainer">
-                <div class="text-center"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3 mt-10 text-brand-400"></i><p class="text-zinc-400">Memuat Logs...</p></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal GPS Tracker -->
-    <div id="trackerModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-4">
-        <div id="trackerModalContent" class="bg-dark-900 w-full max-w-4xl h-[85vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-4 flex justify-between items-center border-b border-zinc-800 bg-dark-950 rounded-t-2xl">
-                <h3 class="text-white text-base font-bold flex items-center gap-2"><div class="w-8 h-8 rounded bg-accent-500/20 flex items-center justify-center border border-accent-500/30"><i class="fa-solid fa-location-crosshairs text-accent-400 text-sm"></i></div> Team GPS Tracker</h3>
-                <button onclick="toggleModal('trackerModal')" class="w-8 h-8 bg-dark-800 hover:bg-zinc-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 space-y-3" id="trackerListContainer">
-                <div class="text-center"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3 mt-10 text-accent-400"></i><p class="text-zinc-400">Memuat Lokasi Tim...</p></div>
+            <div class="p-4 overflow-y-auto scrollbar-hide flex-1 space-y-4">
+                <form id="ewoInputForm" onsubmit="handleEWOInput(event)" class="space-y-2.5 fast-card p-3.5 rounded-xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">No EWO</label><input type="text" id="noEwo" required class="w-full fast-input rounded-lg p-2 text-xs text-white" placeholder="EWO-2026-001"></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Status</label><select id="statEwo" required class="w-full fast-input rounded-lg p-2 text-xs text-white"><option value="Not Done">Not Done</option><option value="Done">Done</option></select></div>
+                    </div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Job Description</label><input type="text" id="deskEwo" required class="w-full fast-input rounded-lg p-2 text-xs text-white" placeholder="Describe task..."></div>
+                    <button type="submit" id="submitEwoBtn" class="w-full bg-amber-500 text-black font-bold py-2.5 rounded-lg active:scale-95 transition text-xs flex items-center justify-center gap-1.5"><i class="fa-solid fa-plus"></i> Create EWO</button>
+                </form>
+                
+                <h4 class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider pl-1">Recent EWO Records</h4>
+                <div id="ewoList" class="space-y-2 text-xs"></div>
             </div>
         </div>
     </div>
 
-    <!-- Modal SOR Batch -->
-    <div id="sorBatchModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-4">
-        <div id="sorBatchModalContent" class="bg-dark-900 w-full max-w-4xl h-[85vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-4 flex justify-between items-center border-b border-zinc-800 bg-dark-950 rounded-t-2xl">
-                <h3 class="text-white text-base font-bold flex items-center gap-2"><div class="w-8 h-8 rounded bg-pink-500/20 flex items-center justify-center border border-pink-500/30"><i class="fa-solid fa-file-waveform text-pink-400 text-sm"></i></div> Advanced SOR Biner Extractor</h3>
-                <button onclick="toggleModal('sorBatchModal')" class="w-8 h-8 bg-dark-800 hover:bg-zinc-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Modal OTDR Files (Android Multi-Upload Robust) -->
+    <div id="otdrModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="otdrModalContent" class="bg-dark-900 w-full md:max-w-xl md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col h-[88vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-4 py-3 flex justify-between items-center border-b border-zinc-800">
+                <h3 class="text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-chart-area text-purple-400 text-xs"></i> OTDR SOR Manager</h3>
+                <button onclick="toggleOTDRModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
-            <div class="p-6 overflow-y-auto flex-1 space-y-6">
-                <div class="bg-pink-500/10 border border-pink-500/20 rounded-xl p-4 text-sm text-pink-300 shadow-neon-blue flex items-start gap-3"><i class="fa-solid fa-microchip text-xl mt-0.5"></i><p>Memakai sistem <span class="font-bold text-white">Dual-Layer Telcordia SR-4731 Parser</span>. Mampu secara luring mengubah file biner .SOR menjadi data JSON jarak & redaman.</p></div>
+            
+            <div class="p-4 overflow-y-auto scrollbar-hide flex-1 space-y-4">
+                <form id="otdrInputForm" onsubmit="handleOTDRBatchUpload(event)" class="space-y-2.5 fast-card p-3.5 rounded-xl border-purple-500/20">
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Folder Name</label><input type="text" id="folderOtdr" class="w-full fast-input rounded-lg p-2 text-xs text-white" placeholder="Opsional: Otomatis Dibuat"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">OTB Name</label><input type="text" id="otbOtdr" required class="w-full fast-input rounded-lg p-2 text-xs text-white" placeholder="OTB-STB-01"></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Location</label><input type="text" id="lokasiOtdr" required class="w-full fast-input rounded-lg p-2 text-xs text-white" placeholder="POP Area"></div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] text-zinc-400 uppercase font-semibold">File SOR (Bisa Pilih Banyak Sekaligus)</label>
+                        <div class="relative w-full border border-dashed border-zinc-700 rounded-lg p-3 text-center bg-dark-950/60">
+                            <!-- Support multi file on all android browsers -->
+                            <input type="file" id="fileOtdr" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="updateFileList(this)">
+                            <div id="fileUploadPrompt" class="flex flex-col items-center pointer-events-none">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl text-purple-400 mb-1"></i>
+                                <span class="text-xs font-semibold text-zinc-200">Ketuk untuk Pilih Berkas .SOR</span>
+                                <span class="text-[9px] text-zinc-500 mt-0.5">Mendukung multi-select Android / PC</span>
+                            </div>
+                            <div id="fileUploadList" class="hidden text-xs text-purple-300 font-medium"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="uploadProgressContainer" class="hidden space-y-1">
+                        <div class="flex justify-between text-[10px] text-zinc-400">
+                            <span id="uploadProgressStatus">Mengunggah...</span>
+                            <span id="uploadProgressPercent" class="font-bold text-purple-400">0%</span>
+                        </div>
+                        <div class="w-full bg-dark-950 rounded-full h-1.5 overflow-hidden border border-zinc-800">
+                            <div id="uploadProgressBar" class="bg-purple-500 h-full w-0 transition-all duration-200"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitOtdrBtn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-2.5 rounded-lg active:scale-95 transition text-xs flex items-center justify-center gap-1.5"><i class="fa-solid fa-upload"></i> Upload Files</button>
+                </form>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-xs text-zinc-400">
+                        <input type="checkbox" id="selectAllOtdr" onchange="toggleAllOTDR(this)" class="w-3.5 h-3.5 accent-purple-500">
+                        <label for="selectAllOtdr" class="cursor-pointer">Select All</label>
+                    </div>
+                    <button onclick="downloadSelectedOTDR()" class="bg-dark-800 text-zinc-300 border border-zinc-700 text-[10px] px-2.5 py-1 rounded-md active:scale-95 transition"><i class="fa-solid fa-download mr-1"></i> Download Selected</button>
+                </div>
+                
+                <div id="otdrList" class="space-y-2.5"></div>
+                
+                <div class="flex justify-between items-center text-xs text-zinc-400 pt-2">
+                    <button id="otdrPrevBtn" onclick="changeOTDRPage(-1)" class="px-3 py-1.5 bg-dark-800 rounded-md border border-zinc-700 disabled:opacity-30">&lt; Prev</button>
+                    <span id="otdrPageInfo" class="font-medium text-[11px]">Page 1 of 1</span>
+                    <button id="otdrNextBtn" onclick="changeOTDRPage(1)" class="px-3 py-1.5 bg-dark-800 rounded-md border border-zinc-700 disabled:opacity-30">Next &gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals Edit Node / EWO / OTDR -->
+    <div id="editModal" class="hidden fixed inset-0 z-[110] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="editModalContent" class="bg-dark-900 w-full md:max-w-lg md:rounded-3xl rounded-t-[28px] border border-amber-500/30 flex flex-col max-h-[90vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-5 py-3.5 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-user-shield"></i> Edit Node Perangkat</h3>
+                <button onclick="toggleEditModal()" class="text-zinc-500"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto scrollbar-hide flex-1">
+                <form id="manualEditForm" onsubmit="handleUpdateData(event)" class="space-y-3">
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Nama Perangkat</label><input type="text" id="editNama" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Tipe Node</label><select id="editTipe" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"><option value="OLT">OLT</option><option value="Switch">Switch</option><option value="Backbone">Backbone</option></select></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">IP Address</label><input type="text" id="editIp" class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    </div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Lokasi Area</label><input type="text" id="editLokasi" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Port Info</label><input type="text" id="editPort" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Kode OTB</label><input type="text" id="editOtb" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    </div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Status</label><select id="editStatus" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"><option value="Online">Online</option><option value="Offline">Offline</option><option value="Warning">Warning</option></select></div>
+                    <div class="pt-2"><button type="submit" id="submitEditBtn" class="w-full bg-amber-500 text-black font-bold py-3 rounded-xl active:scale-95 transition text-xs flex items-center justify-center gap-1.5"><i class="fa-solid fa-save"></i> Apply Changes</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="editEwoModal" class="hidden fixed inset-0 z-[110] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+         <div id="editEwoModalContent" class="bg-dark-900 w-full md:max-w-lg md:rounded-3xl rounded-t-[28px] border border-amber-500/30 flex flex-col max-h-[90vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-5 py-3.5 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-file-pen"></i> Edit EWO</h3>
+                <button onclick="closeEditEWO()" class="text-zinc-500"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto scrollbar-hide flex-1">
+                 <form id="editEwoForm" onsubmit="handleUpdateEWO(event)" class="space-y-3">
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Nomor EWO</label><input type="text" id="editEwoNo" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Deskripsi</label><input type="text" id="editEwoDesk" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Status</label><select id="editEwoStat" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"><option value="Not Done">Not Done</option><option value="Done">Done</option></select></div>
+                    <div class="pt-2"><button type="submit" id="submitEditEwoBtn" class="w-full bg-amber-500 text-black font-bold py-3 rounded-xl active:scale-95 transition text-xs"><i class="fa-solid fa-save mr-1"></i> Save EWO</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="editOtdrModal" class="hidden fixed inset-0 z-[110] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="editOtdrModalContent" class="bg-dark-900 w-full md:max-w-lg md:rounded-3xl rounded-t-[28px] border border-amber-500/30 flex flex-col max-h-[90vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-5 py-3.5 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-amber-400 text-xs font-bold uppercase tracking-wider"><i class="fa-solid fa-file-pen mr-1"></i> Edit Detail OTDR</h3>
+                <button onclick="closeEditOTDR()" class="text-zinc-500"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto scrollbar-hide flex-1">
+                 <form id="editOtdrForm" onsubmit="handleUpdateOTDR(event)" class="space-y-3">
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Folder</label><input type="text" id="editOtdrFolder" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">OTB</label><input type="text" id="editOtdrOtb" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Lokasi</label><input type="text" id="editOtdrLokasi" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="pt-2"><button type="submit" id="submitEditOtdrBtn" class="w-full bg-amber-500 text-black font-bold py-3 rounded-xl active:scale-95 transition text-xs"><i class="fa-solid fa-save mr-1"></i> Save Changes</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="editOtdrFolderModal" class="hidden fixed inset-0 z-[110] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="editOtdrFolderModalContent" class="bg-dark-900 w-full md:max-w-lg md:rounded-3xl rounded-t-[28px] border border-amber-500/30 flex flex-col max-h-[90vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-5 py-3.5 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-amber-400 text-xs font-bold uppercase tracking-wider"><i class="fa-solid fa-folder-pen mr-1"></i> Ubah Nama Folder</h3>
+                <button onclick="closeEditOTDRFolder()" class="text-zinc-500"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto scrollbar-hide flex-1">
+                 <form id="editOtdrFolderForm" onsubmit="handleUpdateOTDRFolder(event)" class="space-y-3">
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-400 uppercase font-semibold">Nama Baru Folder</label><input type="text" id="editOtdrFolderNewName" required class="w-full fast-input rounded-xl p-2.5 text-xs text-white"></div>
+                    <div class="pt-2"><button type="submit" id="submitEditOtdrFolderBtn" class="w-full bg-amber-500 text-black font-bold py-3 rounded-xl active:scale-95 transition text-xs"><i class="fa-solid fa-save mr-1"></i> Apply Rename</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirmDeleteModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 transition-opacity duration-200 opacity-0">
+        <div id="confirmDeleteModalContent" class="bg-dark-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl transition-transform duration-200 transform scale-95">
+            <div class="w-14 h-14 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center text-red-500 mx-auto mb-4"><i class="fa-solid fa-trash-can text-2xl"></i></div>
+            <h3 class="text-white text-base font-bold mb-1">Hapus Data?</h3>
+            <p id="deleteContextType" class="text-zinc-400 text-xs mb-6 leading-relaxed">Tindakan ini permanen dan tidak dapat dipulihkan.</p>
+            <div class="flex gap-2 justify-center">
+                <button onclick="closeDeleteModal()" class="flex-1 bg-dark-800 text-zinc-300 text-xs font-semibold py-3 rounded-xl border border-zinc-700">Batal</button>
+                <button id="confirmDeleteBtn" onclick="executeDeleteData()" class="flex-1 bg-red-500 text-white text-xs font-bold py-3 rounded-xl shadow-lg">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Log Modal -->
+    <div id="activityLogModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="activityLogModalContent" class="bg-dark-900 w-full md:w-[95%] md:max-w-2xl md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col h-[85vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-4 py-3 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-blue-400 text-xs"></i> Activity Logs</h3>
+                <button onclick="closeActivityLogModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto scrollbar-hide flex-1 space-y-2.5" id="activityLogContainer"></div>
+        </div>
+    </div>
+
+    <!-- GPS Tracker Modal -->
+    <div id="trackerModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="trackerModalContent" class="bg-dark-900 w-full md:w-[95%] md:max-w-2xl md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col h-[85vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-4 py-3 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-location-crosshairs text-emerald-400 text-xs"></i> Team GPS Tracker</h3>
+                <div class="flex gap-2">
+                    <button onclick="refreshTrackerData()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-emerald-400"><i id="trackerSyncIcon" class="fa-solid fa-rotate text-xs"></i></button>
+                    <button onclick="closeTrackerModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400"><i class="fa-solid fa-xmark text-sm"></i></button>
+                </div>
+            </div>
+            <div class="p-4 overflow-y-auto scrollbar-hide flex-1 space-y-2.5" id="trackerContainer"></div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="mapModalContent" class="bg-dark-900 w-full md:w-[95%] md:max-w-lg md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col h-[55vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-4 py-3 border-b border-zinc-800 flex justify-between items-center">
+                <h3 class="text-white text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-map-location-dot text-emerald-400 text-xs"></i> Peta BBDM Inner</h3>
+                <button onclick="closeMapModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            <div class="p-6 flex flex-col items-center justify-center text-center flex-1">
+                <div class="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/30 mb-4 shadow-neon-green">
+                    <i class="fa-solid fa-map-location-dot text-3xl text-emerald-400"></i>
+                </div>
+                <h3 class="text-base font-bold text-white mb-1">Peta Backbone & Joint Box</h3>
+                <p class="text-zinc-400 text-xs mb-6 max-w-xs">Akses langsung live peta jalur fiber optik beserta koordinat sambungan.</p>
+                <a href="https://goo.gl/maps/KFG7T5BWDM9cPiL26?g_st=aw" target="_blank" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-5 py-3 rounded-xl font-bold text-xs shadow-neon-green flex items-center gap-2 active:scale-95 transition">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Maps Live
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Advanced Batch SOR Extractor -->
+    <div id="sorBatchModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0">
+        <div id="sorBatchModalContent" class="bg-dark-900 w-full md:max-w-3xl md:mx-auto md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col h-[85vh] transition-transform duration-200 transform translate-y-full">
+            <div class="px-4 py-3 flex justify-between items-center border-b border-zinc-800">
+                <h3 class="text-white text-sm font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-file-waveform text-pink-400 text-xs"></i> Advanced SOR Binary Extractor
+                </h3>
+                <button onclick="closeSorBatchModal()" class="w-7 h-7 bg-dark-800 rounded-full flex justify-center items-center text-zinc-400">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto scrollbar-hide flex-1 space-y-4">
+                <div class="bg-pink-500/10 border border-pink-500/20 rounded-xl p-3 text-xs text-pink-300 shadow-neon-blue">
+                    <i class="fa-solid fa-microchip mr-1"></i>
+                    Memakai sistem <span class="font-bold text-white">Dual-Layer Telcordia SR-4731 Parser</span>. Secara akurat mengubah file SOR menjadi objek data (JSON) untuk Jarak & Loss tanpa perlu library eksternal.
+                </div>
+
                 <div class="flex items-center justify-center w-full">
-                    <label for="sor-advanced-batch-upload" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-zinc-600 hover:border-pink-500 hover:bg-zinc-800/50 rounded-2xl cursor-pointer transition">
+                    <label for="sor-advanced-batch-upload" class="flex flex-col items-center justify-center w-full h-32 border border-dashed border-zinc-700 rounded-xl cursor-pointer bg-dark-950/60 hover:bg-zinc-800 transition">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i class="fa-solid fa-cloud-arrow-up text-4xl text-pink-400 mb-4"></i>
-                            <p class="mb-1 text-base text-zinc-300"><span class="font-bold">Klik atau Drag & Drop</span> File .SOR Kesini</p>
-                            <p class="text-xs text-zinc-500">Support Bulk Upload</p>
+                            <i class="fa-solid fa-upload text-2xl text-pink-400 mb-2"></i>
+                            <p class="mb-1 text-sm text-zinc-300"><span class="font-bold">Ketuk untuk Pilih & Ekstrak</span> File .SOR</p>
+                            <p class="text-[10px] text-zinc-500">Mendukung Multiple Select (EXFO, Anritsu, dll)</p>
                         </div>
                         <input id="sor-advanced-batch-upload" type="file" multiple accept=".sor, application/octet-stream, */*" class="hidden" onchange="sorApp.handleBatch(event)" />
                     </label>
                 </div>
-                <button id="btnSaveSOR" onclick="sorApp.saveToDatabase()" class="hidden w-full bg-gradient-to-r from-pink-600 to-rose-600 text-white font-bold py-4 rounded-xl shadow-lg hover:opacity-90 transition text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-database"></i> Simpan Ekstraksi ke Database Master</button>
+                
+                <button id="btnSaveSOR" onclick="sorApp.saveToDatabase()" class="hidden w-full bg-gradient-to-r from-pink-600 to-rose-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Simpan Hasil ke Database
+                </button>
+                
                 <div class="overflow-x-auto rounded-xl border border-zinc-800 bg-dark-950">
-                    <table class="min-w-full text-left text-sm whitespace-nowrap">
+                    <table class="min-w-full text-left text-[10px] whitespace-nowrap">
                         <thead class="bg-dark-900 text-zinc-400 border-b border-zinc-800">
-                            <tr><th class="px-4 py-3 font-semibold">Nama File SOR</th><th class="px-4 py-3 font-semibold">Status / Enkripsi</th><th class="px-4 py-3 font-semibold">Jarak Kabel (km)</th><th class="px-4 py-3 font-semibold">Total Loss (dB)</th></tr>
+                            <tr>
+                                <th class="px-3 py-2.5 font-semibold">Nama File</th>
+                                <th class="px-3 py-2.5 font-semibold">Metode/Status</th>
+                                <th class="px-3 py-2.5 font-semibold">Jarak (km)</th>
+                                <th class="px-3 py-2.5 font-semibold">Total Loss (dB)</th>
+                            </tr>
                         </thead>
                         <tbody id="sor-results-body" class="divide-y divide-zinc-800/60">
-                            <tr><td colspan="4" class="text-center py-10 text-zinc-500 italic">Data kosong. Pilih file untuk memulai ekstraksi.</td></tr>
+                            <tr><td colspan="4" class="text-center py-8 text-zinc-500 italic">Belum ada file yang diproses</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -328,139 +620,222 @@
         </div>
     </div>
 
-    <!-- Modal OTDR & Map (Placeholders/UI Setup) -->
-    <div id="otdrModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-4">
-        <div id="otdrModalContent" class="bg-dark-900 w-full max-w-4xl h-[85vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-4 flex justify-between items-center border-b border-zinc-800 bg-dark-950 rounded-t-2xl">
-                <h3 class="text-white text-base font-bold flex items-center gap-2"><div class="w-8 h-8 rounded bg-purple-500/20 flex items-center justify-center border border-purple-500/30"><i class="fa-solid fa-chart-area text-purple-400 text-sm"></i></div> OTDR Manager</h3>
-                <button onclick="toggleModal('otdrModal')" class="w-8 h-8 bg-dark-800 hover:bg-zinc-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 text-center text-zinc-400">
-                <i class="fa-solid fa-tools text-4xl mb-3 mt-10"></i><p>Modul OTDR Manager siap diakses melalui API Backend (Telah dihubungkan).</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="mapModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0 p-4">
-        <div id="mapModalContent" class="bg-dark-900 w-full max-w-4xl h-[85vh] rounded-2xl border border-zinc-700 shadow-2xl flex flex-col transition-transform duration-200 transform scale-95">
-            <div class="px-6 py-4 flex justify-between items-center border-b border-zinc-800 bg-dark-950 rounded-t-2xl">
-                <h3 class="text-white text-base font-bold flex items-center gap-2"><div class="w-8 h-8 rounded bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30"><i class="fa-solid fa-map-location-dot text-emerald-400 text-sm"></i></div> Peta Jaringan Live</h3>
-                <button onclick="toggleModal('mapModal')" class="w-8 h-8 bg-dark-800 hover:bg-zinc-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 flex flex-col items-center justify-center text-center">
-                <div class="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center border border-emerald-500/30 mb-5 shadow-neon-green"><i class="fa-solid fa-map-location-dot text-4xl text-emerald-400"></i></div>
-                <h3 class="text-xl font-bold text-white mb-2">Peta Backbone & Joint Box</h3>
-                <a href="https://goo.gl/maps/KFG7T5BWDM9cPiL26?g_st=aw" target="_blank" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-neon-green flex items-center gap-2 mt-4 hover:scale-105 transition"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Google Maps Live</a>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Setup API (Sesuaikan URL jika dihosting secara eksternal)
+        // ==============================================================
+        // FAST API LAYER & OPTIMIZED STATE
+        // ==============================================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbydbmac2A0zMqLpbqYEgjsGnhYrGqa0L-UlfKkx-1KTt5NL7pwGmQ2mRsD85IEqIQ3H/exec"; 
 
-        // Fungsi fetch data API murni (Bypass google.script.run obfuscation)
+        let currentFilter = 'All';
+        let searchTimeout = null;
+        let lastSearchResult = []; 
+        let lastEwoResult = []; 
+        
+        let deleteTargetType = 'NODE';
+        let originalSelectedNode = null; 
+        let originalSelectedEWO = null;
+        let originalSelectedOTDR = null;
+        let originalSelectedOTDRFolder = null; 
+
+        let currentOtdrPage = 1;
+        let totalOtdrPages = 1;
+        let isOwner = false;
+        let gpsTrackerInterval = null;
+
+        // FUNGSI UTAMA: Request Data Menggunakan Fetch Murni 
         const fetchAPI = async (action, payload = {}) => {
+            if (!GAS_API_URL) throw new Error("API URL tidak terdefinisi.");
             const response = await fetch(GAS_API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action, payload })
+                body: JSON.stringify({ action, payload }),
+                redirect: "follow"
             });
             const result = await response.json();
             if (result.error) throw new Error(result.message);
             return result.data;
         };
 
-        let currentFilter = 'All', searchTimeout = null, isOwner = false;
-        let chartLokasiInst = null, chartPortInst = null, chartOverallInst = null;
-
-        // --- Utility Functions ---
-        function showToast(m, t = 'success') {
-            const c = document.getElementById('toastContainer'), d = document.createElement('div');
-            const o = { success: 'border-accent-500 text-accent-400', error: 'border-red-500 text-red-400', info: 'border-brand-500 text-brand-400' };
-            const i = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
-            d.className = `flex items-center gap-3 px-5 py-4 rounded-xl border bg-dark-900 shadow-xl toast-enter ${o[t]}`;
-            d.innerHTML = `<i class="fa-solid ${i[t]} text-lg"></i><span class="text-sm font-bold text-white">${m}</span>`;
-            c.appendChild(d);
-            setTimeout(() => { d.classList.replace('toast-enter', 'toast-exit'); setTimeout(() => d.remove(), 200); }, 3000);
+        // ==============================================================
+        // FAST TOAST & MODAL ENGINE
+        // ==============================================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = { 
+                success: 'bg-dark-900 border-accent-500/50 text-accent-400', 
+                error: 'bg-dark-900 border-red-500/50 text-red-400', 
+                info: 'bg-dark-900 border-brand-500/50 text-brand-400' 
+            };
+            const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+            toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-xl toast-enter ${colors[type]}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type]} text-sm"></i><span class="text-xs font-semibold text-white truncate">${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => { 
+                toast.classList.replace('toast-enter', 'toast-exit');
+                setTimeout(() => toast.remove(), 200); 
+            }, 2600);
         }
 
-        function toggleBtnState(id, isLoading, originalText) {
-            const btn = document.getElementById(id);
+        function setButtonState(btnId, isLoading, text) {
+            const btn = document.getElementById(btnId);
             if (!btn) return;
             if (isLoading) {
-                btn.dataset.og = originalText || btn.innerHTML;
+                btn.dataset.original = text || btn.innerHTML;
                 btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-                btn.disabled = true; btn.classList.add('opacity-70');
+                btn.disabled = true;
+                btn.classList.add('opacity-70');
             } else {
-                btn.innerHTML = btn.dataset.og || originalText;
-                btn.disabled = false; btn.classList.remove('opacity-70');
+                btn.innerHTML = btn.dataset.original || text;
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
             }
         }
 
-        function toggleModal(modalId) {
+        function animateModalOpen(modalId, contentId) {
             const modal = document.getElementById(modalId);
-            const content = document.getElementById(modalId + 'Content');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden'); document.body.style.overflow = 'hidden';
-                requestAnimationFrame(() => { modal.classList.remove('opacity-0'); if (content) content.classList.remove('scale-95'); });
-            } else {
-                modal.classList.add('opacity-0'); if (content) content.classList.add('scale-95');
-                setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = ''; }, 200);
-            }
+            const content = document.getElementById(contentId);
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                if (content) content.classList.remove('translate-y-full');
+            });
+        }
+        
+        function animateModalClose(modalId, contentId) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(contentId);
+            modal.classList.add('opacity-0');
+            if (content) content.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 200);
         }
 
-        // --- Modul Auth ---
-        async function handleLogin(e) {
-            e.preventDefault();
-            const errBox = document.getElementById('loginError'); errBox.classList.add('hidden');
-            toggleBtnState('loginBtn', true);
+        // ==============================================================
+        // SESSION & STORAGE WRAPPER
+        // ==============================================================
+        function getSafeSession() {
+            try { return JSON.parse(localStorage.getItem('netcore_session') || '{}'); } 
+            catch (e) { return {}; }
+        }
+
+        // ==============================================================
+        // GPS TRACKER
+        // ==============================================================
+        function startHiddenGPS(email) {
+            clearInterval(gpsTrackerInterval);
+            if (!navigator.geolocation) return;
+            const sendLocation = () => {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => { fetchAPI('updateLocation', { email, lat: pos.coords.latitude, lng: pos.coords.longitude }).catch(() => {}); },
+                    () => {}, { enableHighAccuracy: true, maximumAge: 15000, timeout: 8000 }
+                );
+            };
+            sendLocation();
+            gpsTrackerInterval = setInterval(sendLocation, 180000);
+        }
+
+        function stopHiddenGPS() {
+            if (gpsTrackerInterval) { clearInterval(gpsTrackerInterval); gpsTrackerInterval = null; }
+        }
+
+        function openTrackerModal() {
+            animateModalOpen('trackerModal', 'trackerModalContent');
+            refreshTrackerData();
+        }
+        function closeTrackerModal() { animateModalClose('trackerModal', 'trackerModalContent'); }
+
+        async function refreshTrackerData() {
+            const syncIcon = document.getElementById('trackerSyncIcon');
+            const container = document.getElementById('trackerContainer');
+            if (syncIcon) syncIcon.classList.add('fa-spin');
+            container.innerHTML = '<div class="text-center py-8 text-emerald-400"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i></div>';
             
             try {
-                const res = await fetchAPI('verifyLogin', { 
-                    email: document.getElementById('loginEmail').value, 
-                    password: document.getElementById('loginPassword').value 
-                });
-                toggleBtnState('loginBtn', false, '<span>Authentikasi Sistem</span><i class="fa-solid fa-arrow-right-to-bracket text-sm"></i>');
-                if (res.success) {
-                    localStorage.setItem('netcore_session', JSON.stringify({ email: res.email, role: res.role }));
-                    checkSession();
-                } else {
-                    errBox.innerText = res.message; errBox.classList.remove('hidden');
-                }
+                const session = getSafeSession();
+                const data = await fetchAPI('getLocations', { email: session.email });
+                renderTrackerData(data);
             } catch (err) {
-                toggleBtnState('loginBtn', false, '<span>Authentikasi Sistem</span>');
-                errBox.innerText = "Error: " + err.message; errBox.classList.remove('hidden');
+                container.innerHTML = `<p class="text-center text-xs text-red-400">${err.message}</p>`;
+            } finally {
+                if (syncIcon) syncIcon.classList.remove('fa-spin');
             }
         }
 
-        function handleLogout() {
-            localStorage.removeItem('netcore_session');
-            document.getElementById('loginForm').reset();
-            document.getElementById('ownerRoleBadge').classList.add('hidden');
-            document.getElementById('adminMenuSection').classList.add('hidden');
-            checkSession();
+        function renderTrackerData(data) {
+            const container = document.getElementById('trackerContainer');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="text-center text-xs text-zinc-500 py-6">Belum ada lokasi terekam.</div>';
+                return;
+            }
+            let html = '';
+            data.forEach(loc => {
+                html += `
+                <div class="fast-card p-3 rounded-xl flex items-center justify-between gap-2">
+                    <div class="truncate">
+                        <span class="text-xs font-bold text-white block truncate">${loc.email}</span>
+                        <span class="text-[10px] text-zinc-500 font-mono">${loc.timestamp}</span>
+                    </div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}" target="_top" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-[10px] font-bold shrink-0">
+                        <i class="fa-solid fa-map-pin mr-1"></i> Maps
+                    </a>
+                </div>`;
+            });
+            container.innerHTML = html;
         }
 
-        function checkSession() {
-            const s = localStorage.getItem('netcore_session');
-            if (s) {
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('dashboardPage').classList.remove('hidden');
-                const d = JSON.parse(s);
-                isOwner = d.role === 'OWNER';
-                if (isOwner) {
-                    document.getElementById('ownerRoleBadge').classList.remove('hidden');
-                    document.getElementById('adminMenuSection').classList.remove('hidden');
-                }
-                refreshDashboardStats();
-            } else {
-                document.getElementById('loginPage').classList.remove('hidden');
-                document.getElementById('dashboardPage').classList.add('hidden');
+        // ==============================================================
+        // ACTIVITY LOGS
+        // ==============================================================
+        async function openActivityLogModal() {
+            animateModalOpen('activityLogModal', 'activityLogModalContent');
+            const container = document.getElementById('activityLogContainer');
+            container.innerHTML = '<div class="text-center py-8 text-blue-400"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i></div>';
+            
+            try {
+                const session = getSafeSession();
+                const data = await fetchAPI('getActivityLogs', { email: session.email });
+                renderActivityLogs(data);
+            } catch (err) {
+                container.innerHTML = `<p class="text-center text-xs text-red-400">${err.message}</p>`;
             }
         }
 
-        // --- Modul Dashboard ---
+        function closeActivityLogModal() { animateModalClose('activityLogModal', 'activityLogModalContent'); }
+
+        function renderActivityLogs(data) {
+            const container = document.getElementById('activityLogContainer');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="text-center text-xs text-zinc-500 py-6">Belum ada log.</div>';
+                return;
+            }
+            let html = '';
+            data.forEach(log => {
+                let badge = 'text-blue-400 bg-blue-500/10 border-blue-500/30';
+                if (log.action.includes('DELETE')) badge = 'text-red-400 bg-red-500/10 border-red-500/30';
+                else if (log.action.includes('UPDATE')) badge = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+                else if (log.action.includes('INSERT') || log.action.includes('UPLOAD')) badge = 'text-accent-400 bg-accent-500/10 border-accent-500/30';
+
+                html += `
+                <div class="fast-card p-3 rounded-xl text-xs space-y-1">
+                    <div class="flex justify-between items-center text-[10px]">
+                        <span class="px-1.5 py-0.5 rounded border font-bold ${badge}">${log.action}</span>
+                        <span class="text-zinc-500 font-mono">${log.timestamp}</span>
+                    </div>
+                    <p class="text-zinc-300">${log.description}</p>
+                    <span class="text-[9px] text-zinc-500 font-mono block">${log.email}</span>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // ==============================================================
+        // DASHBOARD STATS & RECAP
+        // ==============================================================
         async function refreshDashboardStats() {
             const syncIcon = document.getElementById('syncIcon');
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -468,198 +843,1081 @@
             try {
                 const stats = await fetchAPI('getDashboardStats');
                 renderDashboardStats(stats);
-                loadRecapFromServer();
-                showToast('Database Tersinkronisasi', 'success');
+                showToast('Synchronized', 'success');
             } catch (err) {
-                showToast('Gagal Sinkronisasi', 'error');
+                showToast('Sync Failed: ' + err.message, 'error');
             } finally {
                 if (syncIcon) syncIcon.classList.remove('fa-spin');
             }
         }
 
-        function renderDashboardStats(s) {
-            if (!s) return;
+        function renderDashboardStats(stats) {
+            if (!stats) return;
             document.getElementById('summaryCards').innerHTML = `
-                <div class="fast-card p-5 rounded-2xl flex items-center gap-4 border border-brand-500/20"><div class="w-14 h-14 rounded-2xl bg-brand-500/20 text-brand-400 flex items-center justify-center text-2xl shadow-neon-blue"><i class="fa-solid fa-server"></i></div><div><p class="text-xs text-zinc-400 font-bold uppercase tracking-wider">Total Nodes</p><h2 class="text-3xl font-black text-white">${s.total}</h2></div></div>
-                <div class="fast-card p-5 rounded-2xl flex items-center gap-4 border border-accent-500/20"><div class="w-14 h-14 rounded-2xl bg-accent-500/20 text-accent-400 flex items-center justify-center text-2xl shadow-neon-green"><i class="fa-solid fa-wifi"></i></div><div><p class="text-xs text-zinc-400 font-bold uppercase tracking-wider">Node Online</p><h2 class="text-3xl font-black text-white">${s.online}</h2></div></div>
-                <div class="fast-card p-5 rounded-2xl flex items-center gap-4 border border-amber-500/20"><div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl"><i class="fa-solid fa-triangle-exclamation"></i></div><div><p class="text-xs text-zinc-400 font-bold uppercase tracking-wider">Gangguan/Warning</p><h2 class="text-3xl font-black text-white">${s.warning}</h2></div></div>
-                <div class="fast-card p-5 rounded-2xl flex items-center gap-4 border border-red-500/20"><div class="w-14 h-14 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-2xl"><i class="fa-solid fa-plug-circle-xmark"></i></div><div><p class="text-xs text-zinc-400 font-bold uppercase tracking-wider">Node Offline</p><h2 class="text-3xl font-black text-white">${s.offline}</h2></div></div>`;
+                <div class="fast-card p-3.5 rounded-2xl flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center text-base border border-brand-500/30 shadow-neon-blue"><i class="fa-solid fa-server"></i></div>
+                    <div><p class="text-[9px] text-zinc-400 font-semibold uppercase">Nodes</p><h2 class="text-xl font-black text-white">${stats.total}</h2></div>
+                </div>
+                <div class="fast-card p-3.5 rounded-2xl flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-accent-500/20 text-accent-400 flex items-center justify-center text-base border border-accent-500/30 shadow-neon-green"><i class="fa-solid fa-wifi"></i></div>
+                    <div><p class="text-[9px] text-zinc-400 font-semibold uppercase">Online</p><h2 class="text-xl font-black text-white">${stats.online}</h2></div>
+                </div>
+                <div class="fast-card p-3.5 rounded-2xl flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-base border border-amber-500/30"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div><p class="text-[9px] text-zinc-400 font-semibold uppercase">Warning</p><h2 class="text-xl font-black text-white">${stats.warning}</h2></div>
+                </div>
+                <div class="fast-card p-3.5 rounded-2xl flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-base border border-red-500/30"><i class="fa-solid fa-plug-circle-xmark"></i></div>
+                    <div><p class="text-[9px] text-zinc-400 font-semibold uppercase">Offline</p><h2 class="text-xl font-black text-white">${stats.offline}</h2></div>
+                </div>`;
             
             document.getElementById('detailedStats').innerHTML = `
-                <div class="bg-dark-900 p-4 rounded-xl border border-zinc-800 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400"><i class="fa-solid fa-server"></i></div><span class="text-sm font-bold text-zinc-300">Terminal OLT</span></div><span class="text-xl font-black text-white">${s.olt}</span></div>
-                <div class="bg-dark-900 p-4 rounded-xl border border-zinc-800 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fa-solid fa-random"></i></div><span class="text-sm font-bold text-zinc-300">Core Switches</span></div><span class="text-xl font-black text-white">${s.switch}</span></div>
-                <div class="bg-dark-900 p-4 rounded-xl border border-zinc-800 flex justify-between items-center"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400"><i class="fa-solid fa-route"></i></div><span class="text-sm font-bold text-zinc-300">Jalur Backbone</span></div><span class="text-xl font-black text-white">${s.backbone}</span></div>`;
+                <div onclick="loadRecapFromServer()" class="cursor-pointer bg-dark-900/60 p-3 rounded-xl border border-zinc-800 flex justify-between items-center">
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-server text-purple-400"></i><span class="text-xs font-semibold text-zinc-300">OLT Devices</span></div>
+                    <span class="text-sm font-black text-white">${stats.olt}</span>
+                </div>
+                <div onclick="loadRecapFromServer()" class="cursor-pointer bg-dark-900/60 p-3 rounded-xl border border-zinc-800 flex justify-between items-center">
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-random text-blue-400"></i><span class="text-xs font-semibold text-zinc-300">Switches</span></div>
+                    <span class="text-sm font-black text-white">${stats.switch}</span>
+                </div>
+                <div onclick="loadRecapFromServer()" class="cursor-pointer bg-dark-900/60 p-3 rounded-xl border border-zinc-800 flex justify-between items-center">
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-route text-orange-400"></i><span class="text-xs font-semibold text-zinc-300">Backbones</span></div>
+                    <span class="text-sm font-black text-white">${stats.backbone}</span>
+                </div>`;
+        }
+
+        function toggleRecapDropdown() {
+            const panel = document.getElementById('recapDropdownPanel');
+            const chevron = document.getElementById('recapChevron');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+                if (!panel.innerHTML.trim()) loadRecapFromServer();
+            } else {
+                panel.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+
+        function toggleLocAccordion(idx) {
+            const body = document.getElementById('locBody_' + idx);
+            const chev = document.getElementById('locChev_' + idx);
+            if (body.classList.contains('hidden')) {
+                body.classList.remove('hidden');
+                chev.classList.add('rotate-180');
+            } else {
+                body.classList.add('hidden');
+                chev.classList.remove('rotate-180');
+            }
         }
 
         async function loadRecapFromServer() {
-            const p = document.getElementById('recapDropdownPanel');
-            p.innerHTML = `<div class="text-center py-8 text-sm text-brand-400"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Memuat Detail...</div>`;
+            const panel = document.getElementById('recapDropdownPanel');
+            panel.innerHTML = `<div class="text-center py-4 text-xs text-brand-400"><i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i>Loading Overview...</div>`;
+            
             try {
-                const d = await fetchAPI('getRecapStats');
-                if (!d || d.length === 0) {
-                    p.innerHTML = `<div class="text-center py-8 text-sm text-zinc-500">Tidak ada data rekapitulasi.</div>`; return;
+                const data = await fetchAPI('getRecapStats');
+                if (!data || data.length === 0) {
+                    panel.innerHTML = `<div class="text-center py-4 text-xs text-zinc-500">No recap data.</div>`;
+                    return;
                 }
-                
-                let h = '<div class="space-y-3 max-h-[500px] overflow-y-auto pr-2">';
-                d.forEach((l, i) => {
-                    let o = l.OLT.length, s = l.SWITCH.length, b = l.BACKBONE.length;
-                    h += `<div class="bg-dark-900 rounded-xl border border-zinc-800 overflow-hidden text-sm"><div class="p-4 flex justify-between items-center cursor-pointer hover:bg-zinc-800/50 transition" onclick="toggleAccordion(${i})"><span class="font-bold text-white text-base"><i class="fa-solid fa-map-pin text-accent-500 mr-2"></i>${l.lokasi}</span><div class="flex items-center gap-2 text-xs font-bold">${o>0?`<span class="bg-purple-500/20 text-purple-400 px-2 py-1 rounded-md">${o} OLT</span>`:''}${s>0?`<span class="bg-blue-500/20 text-blue-400 px-2 py-1 rounded-md">${s} SW</span>`:''}${b>0?`<span class="bg-orange-500/20 text-orange-400 px-2 py-1 rounded-md">${b} BB</span>`:''}<i id="locChev_${i}" class="fa-solid fa-chevron-down text-zinc-500 ml-2 transition-transform"></i></div></div><div id="locBody_${i}" class="hidden p-4 bg-dark-950 border-t border-zinc-800 space-y-3">`;
+                let html = '<div class="space-y-2 max-h-[350px] overflow-y-auto scrollbar-hide">';
+                data.forEach((loc, idx) => {
+                    let o = loc.OLT.length, s = loc.SWITCH.length, b = loc.BACKBONE.length;
+                    html += `
+                    <div class="bg-dark-900/80 rounded-xl border border-zinc-800 overflow-hidden text-xs">
+                        <div class="p-2.5 flex justify-between items-center cursor-pointer" onclick="toggleLocAccordion(${idx})">
+                            <span class="font-bold text-white"><i class="fa-solid fa-map-pin text-accent-500 mr-1.5"></i>${loc.lokasi}</span>
+                            <div class="flex items-center gap-1.5 text-[9px] font-semibold">
+                                ${o>0 ? `<span class="bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded">${o} OLT</span>`:''}
+                                ${s>0 ? `<span class="bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">${s} SW</span>`:''}
+                                ${b>0 ? `<span class="bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded">${b} BB</span>`:''}
+                                <i id="locChev_${idx}" class="fa-solid fa-chevron-down text-zinc-500 ml-1 transition-transform"></i>
+                            </div>
+                        </div>
+                        <div id="locBody_${idx}" class="hidden p-2.5 bg-dark-950/60 border-t border-zinc-800/80 space-y-2">`;
                     
-                    const r = (t, m, ic, c) => {
-                        if (!m || m.length === 0) return '';
-                        let u = `<div class="text-xs font-bold text-zinc-400 uppercase mb-2"><i class="fa-solid ${ic} ${c} mr-2"></i>${t}</div><div class="grid grid-cols-2 gap-2 mb-3">`;
-                        m.forEach(v => { u += `<div class="bg-dark-800 p-2.5 rounded-lg border border-zinc-700 flex justify-between items-center text-xs"><span class="text-zinc-200 font-semibold truncate w-1/2">${v.nama}</span><div class="flex gap-1.5"><span class="bg-dark-900 text-zinc-300 px-2 py-1 rounded font-mono">${v.total_port} Port</span><span class="bg-dark-900 text-zinc-300 px-2 py-1 rounded font-mono">${v.total_otb} OTB</span></div></div>`; });
-                        u += `</div>`; return u;
+                    const renderList = (title, items, icon, color) => {
+                        if (!items || items.length === 0) return '';
+                        let out = `<div class="text-[9px] font-bold text-zinc-400 uppercase"><i class="fa-solid ${icon} ${color} mr-1"></i>${title}</div>`;
+                        items.forEach(dev => {
+                            out += `
+                            <div class="bg-dark-900 p-1.5 rounded-lg border border-zinc-800/80 flex justify-between items-center text-[10px]">
+                                <span class="text-zinc-200 font-medium truncate w-1/2">${dev.nama}</span>
+                                <div class="flex gap-1">
+                                    <span class="bg-dark-800 text-zinc-400 px-1.5 py-0.5 rounded">${dev.total_port}P</span>
+                                    <span class="bg-dark-800 text-zinc-400 px-1.5 py-0.5 rounded">${dev.total_otb}O</span>
+                                </div>
+                            </div>`;
+                        });
+                        return out;
                     };
-                    h += r('Data OLT', l.OLT, 'fa-server', 'text-purple-400') + r('Data Switch', l.SWITCH, 'fa-random', 'text-blue-400') + r('Data Backbone', l.BACKBONE, 'fa-route', 'text-orange-400') + `</div></div>`;
+
+                    html += renderList('OLT', loc.OLT, 'fa-server', 'text-purple-400');
+                    html += renderList('Switch', loc.SWITCH, 'fa-random', 'text-blue-400');
+                    html += renderList('Backbone', loc.BACKBONE, 'fa-route', 'text-orange-400');
+                    html += `</div></div>`;
                 });
-                h += '</div>'; p.innerHTML = h;
-                
-                renderCharts(d);
-            } catch (e) {
-                p.innerHTML = `<div class="text-center py-8 text-sm text-red-400">Gagal memuat rekap.</div>`;
+                html += '</div>';
+                panel.innerHTML = html;
+            } catch(err) {
+                panel.innerHTML = `<div class="text-center py-4 text-xs text-red-400">Failed to load recap: ${err.message}</div>`;
             }
         }
+
+        // ==============================================================
+        // HIGH PERFORMANCE NODE LIST & SEARCH
+        // ==============================================================
+        function openDatabaseModal(type) {
+            setModalFilter(type);
+            animateModalOpen('databaseModal', 'databaseModalContent');
+        }
+        function closeDatabaseModal() { animateModalClose('databaseModal', 'databaseModalContent'); }
         
-        function toggleAccordion(i) {
-            const b = document.getElementById('locBody_'+i), c = document.getElementById('locChev_'+i);
-            if (b.classList.contains('hidden')) { b.classList.remove('hidden'); c.classList.add('rotate-180'); }
-            else { b.classList.add('hidden'); c.classList.remove('rotate-180'); }
-        }
-
-        function renderCharts(d) {
-            let l = [], pn = [], po = [], ps = [], to = 0, ts = 0, tb = 0;
-            d.forEach(c => {
-                l.push(c.lokasi);
-                pn.push(c.OLT.length + c.SWITCH.length + c.BACKBONE.length);
-                to += c.OLT.length; ts += c.SWITCH.length; tb += c.BACKBONE.length;
-                let pc = 0, sc = 0;
-                c.OLT.forEach(x => pc += x.total_port); po.push(pc);
-                c.SWITCH.forEach(x => sc += x.total_port); ps.push(sc);
+        function setModalFilter(type) {
+            currentFilter = type;
+            document.querySelectorAll('.modal-filter-btn').forEach(btn => { 
+                btn.className = 'modal-filter-btn shrink-0 bg-dark-800 text-zinc-400 border border-zinc-700 px-3 py-1.5 rounded-full text-xs font-semibold'; 
             });
-            if (chartLokasiInst) chartLokasiInst.destroy();
-            if (chartPortInst) chartPortInst.destroy();
-            if (chartOverallInst) chartOverallInst.destroy();
-            
-            Chart.defaults.color = '#a1a1aa'; Chart.defaults.font.family = 'Inter';
-            
-            chartLokasiInst = new Chart(document.getElementById('chartLokasi').getContext('2d'), { type: 'doughnut', data: { labels: l, datasets: [{ data: pn, backgroundColor: ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#ec4899','#14b8a6'], borderWidth: 0, hoverOffset: 4 }]}, options: { responsive: !0, maintainAspectRatio: !1, plugins: { legend: { position: 'right', labels: { color: '#e4e4e7', font: { size: 11 } } } }, cutout: '75%' } });
-            chartPortInst = new Chart(document.getElementById('chartPort').getContext('2d'), { type: 'bar', data: { labels: l, datasets: [{ label: 'Port OLT', data: po, backgroundColor: '#a855f7', borderRadius: 4 }, { label: 'Port Switch', data: ps, backgroundColor: '#3b82f6', borderRadius: 4 }]}, options: { responsive: !0, maintainAspectRatio: !1, scales: { x: { stacked: !0, grid: { display: !1 } }, y: { stacked: !0, grid: { color: 'rgba(255, 255, 255, 0.05)' } } }, plugins: { legend: { position: 'top', labels: { color: '#e4e4e7', boxWidth: 12 } } } } });
-            chartOverallInst = new Chart(document.getElementById('chartOverall').getContext('2d'), { type: 'polarArea', data: { labels: ['Total OLT', 'Total Switch', 'Total Backbone'], datasets: [{ data: [to, ts, tb], backgroundColor: ['rgba(168, 85, 247, 0.7)','rgba(59, 130, 246, 0.7)','rgba(249, 115, 22, 0.7)'], borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' }] }, options: { responsive: !0, maintainAspectRatio: !1, plugins: { legend: { position: 'bottom', labels: { color: '#e4e4e7' } } } } });
+            const activeBtn = document.getElementById(`modal-btn-${type}`);
+            if (activeBtn) activeBtn.className = 'modal-filter-btn shrink-0 bg-brand-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold shadow-neon-blue';
+            triggerServerSearch();
         }
 
-        // --- Modul Database (Tabel Pencarian) ---
-        function openDatabaseModal(t) { setModalFilter(t); toggleModal('databaseModal'); }
-        function setModalFilter(t) {
-            currentFilter = t;
-            document.querySelectorAll('.modal-filter-btn').forEach(x => x.className = 'modal-filter-btn px-6 py-2 rounded-lg text-sm font-semibold text-zinc-400 hover:text-white transition');
-            const a = document.getElementById('modal-btn-' + t);
-            if (a) a.className = 'modal-filter-btn px-6 py-2 rounded-lg text-sm font-semibold transition bg-brand-500 text-white shadow-neon-blue';
-            triggerSearch();
-        }
-        function triggerSearch() {
+        function triggerServerSearch() {
             clearTimeout(searchTimeout);
             document.getElementById('serverLoadingIndicator').classList.remove('hidden');
             searchTimeout = setTimeout(async () => {
-                const f = { type: currentFilter, nama: document.getElementById('searchNama').value, lokasi: document.getElementById('searchLokasi').value, port: document.getElementById('searchPort').value, otb: document.getElementById('searchOtb').value };
+                const filters = { 
+                    type: currentFilter, 
+                    nama: document.getElementById('searchNama').value, 
+                    lokasi: document.getElementById('searchLokasi').value, 
+                    port: document.getElementById('searchPort').value, 
+                    otb: document.getElementById('searchOtb').value 
+                };
+                
                 try {
-                    const d = await fetchAPI('searchNetworkData', f);
-                    renderTableData(d);
-                } catch (e) {
-                    showToast(e.message, 'error');
+                    const data = await fetchAPI('searchNetworkData', filters);
+                    renderTable(data);
+                } catch (err) {
+                    showToast(err.message, 'error');
                 } finally {
                     document.getElementById('serverLoadingIndicator').classList.add('hidden');
                 }
-            }, 300);
-        }
-        function renderTableData(d) {
-            const c = document.getElementById('data-list-container'), e = document.getElementById('emptyState');
-            if (!d || d.length === 0) { c.innerHTML = ''; e.classList.remove('hidden'); return; }
-            e.classList.add('hidden');
-            let h = '';
-            for (let i = 0; i < d.length; i++) {
-                let x = d[i], b = 'border-l-purple-500';
-                if (x.tipe === 'Switch') b = 'border-l-blue-500'; else if (x.tipe === 'Backbone') b = 'border-l-orange-500';
-                h += `<div class="fast-card p-4 rounded-xl border-l-4 ${b} flex flex-col"><h4 class="font-bold text-white text-sm">${x.nama_perangkat}</h4><div class="text-xs text-zinc-400 mt-1 mb-3"><i class="fa-solid fa-location-dot mr-1"></i> ${x.lokasi}</div><div class="grid grid-cols-2 gap-2 mt-auto"><div class="bg-dark-900 p-2.5 rounded-lg border border-zinc-700"><span class="block text-[9px] text-zinc-500 font-bold mb-1 tracking-wider">DETAIL PORT</span><span class="text-xs font-mono text-zinc-300 break-words">${x.info_port}</span></div><div class="bg-dark-900 p-2.5 rounded-lg border border-zinc-700"><span class="block text-[9px] text-zinc-500 font-bold mb-1 tracking-wider">KODE OTB</span><span class="text-xs font-mono text-zinc-300 break-words">${x.kode_otb}</span></div></div></div>`;
-            }
-            c.innerHTML = h;
+            }, 280);
         }
 
-        // --- Modul Submit Input Node ---
+        function renderTable(data) {
+            lastSearchResult = data || [];
+            const container = document.getElementById('data-list-container');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            let htmlContent = '';
+            for (let i = 0; i < data.length; i++) {
+                const item = data[i];
+                let tb = 'border-l-purple-500', tc = 'text-purple-400 bg-purple-500/10 border-purple-500/30', ti = 'fa-server';
+                if (item.tipe === 'Switch') { tb = 'border-l-blue-500'; tc = 'text-blue-400 bg-blue-500/10 border-blue-500/30'; ti = 'fa-random'; }
+                else if (item.tipe === 'Backbone') { tb = 'border-l-orange-500'; tc = 'text-orange-400 bg-orange-500/10 border-orange-500/30'; ti = 'fa-route'; }
+                
+                let sc = 'text-accent-400 bg-accent-500/10 border-accent-500/30', dot = 'bg-accent-500';
+                if (item.status === 'Offline') { sc = 'text-red-400 bg-red-500/10 border-red-500/30'; dot = 'bg-red-500'; }
+                else if (item.status === 'Warning') { sc = 'text-amber-400 bg-amber-500/10 border-amber-500/30'; dot = 'bg-amber-500'; }
+
+                const ownerActions = isOwner ? `
+                    <div class="flex gap-2 mt-2 pt-2 border-t border-zinc-800">
+                        <button onclick="openEditModal(${i})" class="flex-1 bg-dark-900 text-amber-400 border border-zinc-700 text-[10px] font-bold py-1.5 rounded-lg active:scale-95"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
+                        <button onclick="confirmDeleteNode(${i})" class="flex-1 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold py-1.5 rounded-lg active:scale-95"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
+                    </div>` : '';
+
+                htmlContent += `
+                    <div class="node-item-card fast-card p-3.5 rounded-2xl border-l-4 ${tb} flex flex-col gap-2">
+                        <div class="flex justify-between items-start gap-2">
+                            <h4 class="font-bold text-white text-xs md:text-sm truncate">${item.nama_perangkat}</h4>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold border flex items-center gap-1 shrink-0 ${tc}">
+                                <i class="fa-solid ${ti}"></i> ${item.tipe}
+                            </span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="text-brand-400 font-mono"><i class="fa-solid fa-network-wired mr-1"></i>${item.ip_address || '-'}</span>
+                            <span class="px-2 py-0.5 rounded-full border font-bold flex items-center gap-1 ${sc}">
+                                <span class="w-1.5 h-1.5 rounded-full ${dot}"></span> ${item.status}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-1 text-[10px] text-zinc-400">
+                            <div><i class="fa-solid fa-map-pin text-accent-500 mr-1"></i><span class="text-zinc-200 truncate font-medium">${item.lokasi || '-'}</span></div>
+                            <div><i class="fa-solid fa-ethernet text-purple-400 mr-1"></i><span class="text-zinc-200 truncate font-medium">${item.info_port || '-'}</span></div>
+                        </div>
+                        
+                        <div class="bg-dark-900/90 border border-zinc-800 p-1.5 rounded-lg flex justify-between items-center text-[10px]">
+                            <span class="text-zinc-400"><i class="fa-solid fa-barcode text-orange-400 mr-1"></i>OTB</span>
+                            <span class="font-mono text-white font-bold">${item.kode_otb || '-'}</span>
+                        </div>
+                        ${ownerActions}
+                    </div>`;
+            }
+            container.innerHTML = htmlContent;
+        }
+
+        // ==============================================================
+        // CRUD ACTIONS (NODE, EWO, OTDR)
+        // ==============================================================
+        function toggleInputModal() { 
+            const mod = document.getElementById('inputModal');
+            if (mod.classList.contains('hidden')) animateModalOpen('inputModal', 'inputModalContent'); 
+            else animateModalClose('inputModal', 'inputModalContent');
+        }
+
         async function handleInputData(e) {
-            e.preventDefault(); toggleBtnState('submitInputBtn', true);
-            const s = JSON.parse(localStorage.getItem('netcore_session') || '{}');
-            const payload = {
-                nama_perangkat: document.getElementById('inputNama').value, tipe: document.getElementById('inputTipe').value,
-                ip_address: document.getElementById('inputIp').value || '-', lokasi: document.getElementById('inputLokasi').value,
-                info_port: document.getElementById('inputPort').value || '-', kode_otb: document.getElementById('inputOtb').value || '-',
-                status: document.getElementById('inputStatus').value
+            e.preventDefault();
+            setButtonState('submitInputBtn', true);
+            const session = getSafeSession();
+            const dataObj = { 
+                nama_perangkat: document.getElementById('inputNama').value, 
+                tipe: document.getElementById('inputTipe').value, 
+                ip_address: document.getElementById('inputIp').value || '-', 
+                lokasi: document.getElementById('inputLokasi').value, 
+                info_port: document.getElementById('inputPort').value || '-', 
+                kode_otb: document.getElementById('inputOtb').value || '-', 
+                status: document.getElementById('inputStatus').value 
             };
+
             try {
-                const r = await fetchAPI('insertNetworkData', { dataObj: payload, email: s.email });
-                if (r.success) {
-                    showToast(r.message, 'success'); document.getElementById('manualInputForm').reset(); toggleModal('inputModal'); refreshDashboardStats();
-                } else showToast(r.message, 'error');
+                const res = await fetchAPI('insertNetworkData', { dataObj, email: session.email });
+                if (res.success) { 
+                    showToast(res.message, 'success'); 
+                    document.getElementById('manualInputForm').reset(); 
+                    toggleInputModal(); 
+                    refreshDashboardStats(); 
+                    triggerServerSearch(); 
+                } else {
+                    showToast(res.message, 'error');
+                }
             } catch (err) {
                 showToast(err.message, 'error');
             } finally {
-                toggleBtnState('submitInputBtn', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Simpan ke Database Utama');
+                setButtonState('submitInputBtn', false, '<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Node');
             }
         }
 
-        // --- Modul Lain-lain (EWO, Activity Log, GPS Tracker) ---
-        async function toggleEwoModal() {
-            toggleModal('ewoModal');
-            const c = document.getElementById('ewoListContainer');
-            c.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3 mt-10 text-amber-400"></i><p>Memuat Data EWO...</p>';
-            try {
-                const d = await fetchAPI('getEWOData');
-                if (!d || d.length === 0) { c.innerHTML = '<p class="mt-10">Belum ada Work Order (EWO) aktif.</p>'; return; }
-                let h = '<div class="space-y-3 text-left">';
-                d.forEach(x => {
-                    const bg = x.status === 'Done' ? 'border-l-accent-500' : 'border-l-amber-500';
-                    h += `<div class="fast-card p-4 rounded-xl border-l-4 ${bg}"><h4 class="font-bold text-white text-sm">${x.no_ewo} <span class="float-right text-xs bg-dark-900 px-2 py-1 rounded">${x.status}</span></h4><p class="text-xs text-zinc-400 mt-2">${x.deskripsi}</p></div>`;
-                });
-                c.innerHTML = h + '</div>';
-            } catch (e) { c.innerHTML = '<p class="mt-10 text-red-400">Gagal memuat EWO.</p>'; }
+        function toggleEditModal() {
+            const mod = document.getElementById('editModal');
+            if (mod.classList.contains('hidden')) animateModalOpen('editModal', 'editModalContent'); 
+            else animateModalClose('editModal', 'editModalContent');
         }
 
-        async function toggleActivityModal() {
-            toggleModal('activityModal');
-            const c = document.getElementById('activityListContainer');
-            c.innerHTML = '<div class="text-center"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3 mt-10 text-brand-400"></i><p class="text-zinc-400">Memuat Logs...</p></div>';
-            const s = JSON.parse(localStorage.getItem('netcore_session') || '{}');
-            try {
-                const d = await fetchAPI('getActivityLogs', { email: s.email });
-                if (!d || d.length === 0) { c.innerHTML = '<div class="text-center mt-10"><p>Belum ada rekaman aktivitas.</p></div>'; return; }
-                let h = '<div class="space-y-3 text-left">';
-                d.forEach(x => {
-                    h += `<div class="fast-card p-4 rounded-xl border border-zinc-700 flex flex-col gap-1"><div class="flex justify-between items-center"><span class="text-xs font-bold text-brand-400">${x.action}</span><span class="text-[10px] text-zinc-500">${x.timestamp}</span></div><p class="text-sm text-zinc-300">${x.description}</p><span class="text-xs text-zinc-500">${x.email} (${x.role})</span></div>`;
-                });
-                c.innerHTML = h + '</div>';
-            } catch (e) { c.innerHTML = '<div class="text-center mt-10"><p class="text-red-400">Gagal memuat Activity Logs.</p></div>'; }
+        function openEditModal(index) {
+            const data = lastSearchResult[index];
+            if (!data) return;
+            originalSelectedNode = data;
+            document.getElementById('editNama').value = data.nama_perangkat;
+            document.getElementById('editTipe').value = data.tipe;
+            document.getElementById('editIp').value = data.ip_address === '-' ? '' : data.ip_address;
+            document.getElementById('editLokasi').value = data.lokasi;
+            document.getElementById('editStatus').value = data.status;
+            document.getElementById('editPort').value = data.info_port;
+            document.getElementById('editOtb').value = data.kode_otb;
+            toggleEditModal();
         }
 
-        async function toggleTrackerModal() {
-            toggleModal('trackerModal');
-            const c = document.getElementById('trackerListContainer');
-            c.innerHTML = '<div class="text-center"><i class="fa-solid fa-circle-notch fa-spin text-4xl mb-3 mt-10 text-accent-400"></i><p class="text-zinc-400">Memuat Lokasi Tim...</p></div>';
-            const s = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+        async function handleUpdateData(e) {
+            e.preventDefault();
+            setButtonState('submitEditBtn', true);
+            const session = getSafeSession();
+            const updatedData = { 
+                nama_perangkat: document.getElementById('editNama').value, 
+                tipe: document.getElementById('editTipe').value, 
+                ip_address: document.getElementById('editIp').value || '-', 
+                lokasi: document.getElementById('editLokasi').value, 
+                info_port: document.getElementById('editPort').value, 
+                kode_otb: document.getElementById('editOtb').value, 
+                status: document.getElementById('editStatus').value 
+            };
+
             try {
-                const d = await fetchAPI('getLocations', { email: s.email });
-                if (!d || d.length === 0) { c.innerHTML = '<div class="text-center mt-10"><p>Belum ada data GPS tim yang terlacak.</p></div>'; return; }
-                let h = '<div class="space-y-3 text-left">';
-                d.forEach(x => {
-                    h += `<div class="fast-card p-4 rounded-xl border border-zinc-700 flex justify-between items-center gap-4"><div><span class="block text-sm font-bold text-white mb-1">${x.email}</span><span class="text-xs text-zinc-500">Terakhir: ${x.timestamp}</span></div><a href="https://www.google.com/maps/search/?api=1&query=${x.lat},${x.lng}" target="_blank" class="bg-accent-500/10 text-accent-400 px-4 py-2 rounded-lg font-bold text-xs"><i class="fa-solid fa-map-pin mr-1"></i> Maps</a></div>`;
-                });
-                c.innerHTML = h + '</div>';
-            } catch (e) { c.innerHTML = '<div class="text-center mt-10"><p class="text-red-400">Gagal memuat Lokasi.</p></div>'; }
+                const res = await fetchAPI('updateNetworkData', { originalData: originalSelectedNode, updatedData, email: session.email });
+                if (res.success) { 
+                    showToast(res.message, 'success'); 
+                    toggleEditModal(); 
+                    triggerServerSearch(); 
+                    refreshDashboardStats(); 
+                } else {
+                    showToast(res.message, 'error');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                setButtonState('submitEditBtn', false, '<i class="fa-solid fa-save mr-1"></i> Apply Changes');
+            }
         }
 
-        // --- Mockup Modul SOR Extractor ---
+        // ==============================================================
+        // EWO MODULE
+        // ==============================================================
+        function toggleEWOModal() {
+            const mod = document.getElementById('ewoModal');
+            if (mod.classList.contains('hidden')) { 
+                animateModalOpen('ewoModal', 'ewoModalContent'); 
+                refreshEWOList(); 
+            } else animateModalClose('ewoModal', 'ewoModalContent');
+        }
+
+        async function refreshEWOList() {
+            const lst = document.getElementById('ewoList');
+            lst.innerHTML = '<div class="text-center py-4 text-amber-400"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
+            try {
+                const data = await fetchAPI('getEWOData');
+                renderEWOList(data);
+            } catch (err) {
+                lst.innerHTML = `<div class="text-center py-4 text-xs text-red-400">Gagal memuat: ${err.message}</div>`;
+            }
+        }
+
+        function renderEWOList(data) {
+            lastEwoResult = data || [];
+            const container = document.getElementById('ewoList');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="text-center text-zinc-500 py-3 text-xs italic">No EWO records.</div>';
+                return;
+            }
+            let html = '';
+            data.forEach(item => {
+                const statClass = item.status === 'Done' ? 'text-accent-400 bg-accent-500/10 border-accent-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+                const ownerActions = isOwner ? `
+                    <div class="mt-2 pt-1.5 border-t border-zinc-800 flex gap-2">
+                        <button onclick="openEditEWO('${item.no_ewo}', '${item.deskripsi}')" class="text-[9px] text-amber-400 px-2 py-1 bg-dark-900 rounded border border-zinc-700"><i class="fa-solid fa-pen mr-1"></i>Edit</button>
+                        <button onclick="confirmDeleteEWO('${item.no_ewo}', '${item.deskripsi}')" class="text-[9px] text-red-400 px-2 py-1 bg-dark-900 rounded border border-zinc-700"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>
+                    </div>` : '';
+                html += `
+                    <div class="fast-card p-3 rounded-xl border-l-4 ${item.status === 'Done' ? 'border-l-accent-500' : 'border-l-amber-500'}">
+                        <div class="flex justify-between items-start mb-1"><span class="font-bold text-white text-xs">${item.no_ewo}</span><span class="text-[9px] px-2 py-0.5 rounded-full border font-semibold ${statClass}">${item.status}</span></div>
+                        <p class="text-zinc-400 text-xs line-clamp-2">${item.deskripsi}</p>
+                        ${ownerActions}
+                    </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        async function handleEWOInput(e) {
+            e.preventDefault();
+            setButtonState('submitEwoBtn', true);
+            const session = getSafeSession();
+            const dataObj = { no_ewo: document.getElementById('noEwo').value, deskripsi: document.getElementById('deskEwo').value, status: document.getElementById('statEwo').value };
+            
+            try {
+                const res = await fetchAPI('insertEWOData', { dataObj, email: session.email });
+                if (res.success) { 
+                    showToast(res.message, 'success'); 
+                    document.getElementById('ewoInputForm').reset(); 
+                    refreshEWOList(); 
+                } else {
+                    showToast(res.message, 'error');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                setButtonState('submitEwoBtn', false, '<i class="fa-solid fa-plus mr-1"></i> Create EWO');
+            }
+        }
+
+        function openEditEWO(no_ewo, deskripsi) { originalSelectedEWO = {no_ewo, deskripsi}; document.getElementById('editEwoNo').value = no_ewo; document.getElementById('editEwoDesk').value = deskripsi; animateModalOpen('editEwoModal', 'editEwoModalContent'); }
+        function closeEditEWO() { animateModalClose('editEwoModal', 'editEwoModalContent'); }
+        
+        async function handleUpdateEWO(e) {
+            e.preventDefault();
+            setButtonState('submitEditEwoBtn', true);
+            const session = getSafeSession();
+            const updated = { no_ewo: document.getElementById('editEwoNo').value, deskripsi: document.getElementById('editEwoDesk').value, status: document.getElementById('editEwoStat').value };
+            
+            try {
+                const res = await fetchAPI('updateEWOData', { originalData: originalSelectedEWO, updatedData: updated, email: session.email });
+                if (res.success) { 
+                    showToast(res.message, 'success'); 
+                    closeEditEWO(); 
+                    refreshEWOList(); 
+                } else {
+                    showToast(res.message, 'error');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                setButtonState('submitEditEwoBtn', false, '<i class="fa-solid fa-save mr-1"></i> Save EWO');
+            }
+        }
+
+        // ==============================================================
+        // OTDR MANAGER & ANDROID BULK UPLOAD ENGINE
+        // ==============================================================
+        function toggleOTDRModal() {
+            const mod = document.getElementById('otdrModal');
+            if (mod.classList.contains('hidden')) { 
+                animateModalOpen('otdrModal', 'otdrModalContent'); 
+                refreshOTDRList(1); 
+            } else animateModalClose('otdrModal', 'otdrModalContent');
+        }
+
+        async function refreshOTDRList(page) {
+            const lst = document.getElementById('otdrList');
+            lst.innerHTML = '<div class="text-center py-6 text-purple-400"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i></div>';
+            
+            try {
+                const res = await fetchAPI('getOTDRData', { page });
+                currentOtdrPage = res.currentPage; totalOtdrPages = res.totalPages;
+                document.getElementById('otdrPageInfo').innerText = `Page ${currentOtdrPage} of ${totalOtdrPages}`;
+                document.getElementById('otdrPrevBtn').disabled = currentOtdrPage <= 1;
+                document.getElementById('otdrNextBtn').disabled = currentOtdrPage >= totalOtdrPages;
+                document.getElementById('selectAllOtdr').checked = false;
+                renderOTDRList(res.data);
+            } catch (err) {
+                lst.innerHTML = `<div class="text-center py-4 text-xs text-red-400">Gagal memuat OTDR: ${err.message}</div>`;
+            }
+        }
+
+        function changeOTDRPage(dir) { refreshOTDRList(currentOtdrPage + dir); }
+
+        function toggleFolderContent(headerEl) {
+            const content = headerEl.nextElementSibling;
+            const chevron = headerEl.querySelector('.chevron-icon');
+            const folderIcon = headerEl.querySelector('.folder-icon');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+                folderIcon.classList.replace('fa-folder', 'fa-folder-open');
+            } else {
+                content.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+                folderIcon.classList.replace('fa-folder-open', 'fa-folder');
+            }
+        }
+
+        function renderOTDRList(data) {
+            const lst = document.getElementById('otdrList');
+            if (!data || data.length === 0) {
+                lst.innerHTML = '<div class="text-zinc-500 italic text-center py-4 text-xs">Belum ada file OTDR.</div>';
+                return;
+            }
+            let folders = {};
+            data.forEach(item => {
+                let f = item.nama_folder || 'Umum';
+                if (!folders[f]) folders[f] = [];
+                folders[f].push(item);
+            });
+            
+            let html = '';
+            for (let fName in folders) {
+                let folderOwnerHTML = '';
+                if (isOwner) {
+                    let sfn = fName.replace(/'/g, "\\'");
+                    folderOwnerHTML = `
+                        <div class="flex items-center gap-1.5 mr-2 border-r border-zinc-700 pr-2">
+                            <button type="button" onclick="event.stopPropagation(); openEditOTDRFolder('${sfn}')" class="bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded text-[9px] border border-amber-500/30"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" onclick="event.stopPropagation(); confirmDeleteOTDRFolder('${sfn}')" class="bg-red-500/10 text-red-400 px-1.5 py-0.5 rounded text-[9px] border border-red-500/30"><i class="fa-solid fa-trash"></i></button>
+                        </div>`;
+                }
+
+                html += `
+                <div class="border border-zinc-800 rounded-xl overflow-hidden bg-dark-900/60 text-xs">
+                    <div onclick="toggleFolderContent(this)" class="bg-dark-800/80 px-3 py-2.5 font-bold text-zinc-300 flex items-center justify-between cursor-pointer">
+                        <span class="flex items-center truncate flex-1 pr-2">
+                            <i class="fa-solid fa-folder text-purple-400 mr-2 folder-icon"></i>
+                            <span class="truncate">${fName}</span>
+                            <span class="ml-2 text-[9px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded">${folders[fName].length} Files</span>
+                        </span>
+                        <div class="flex items-center">
+                            ${folderOwnerHTML}
+                            <i class="fa-solid fa-chevron-down text-zinc-500 transition-transform chevron-icon text-[10px]"></i>
+                        </div>
+                    </div>
+                    <div class="p-2 space-y-1.5 hidden">`;
+                
+                folders[fName].forEach(item => {
+                    let ownerHTML = '';
+                    if (isOwner) {
+                        let so = item.nama_otb.replace(/'/g, "\\'");
+                        let st = item.timestamp.replace(/'/g, "\\'");
+                        let sf = (item.nama_folder || 'Umum').replace(/'/g, "\\'");
+                        let sl = item.lokasi.replace(/'/g, "\\'");
+                        ownerHTML = `
+                            <button type="button" onclick="openEditOTDR('${so}', '${st}', '${sf}', '${sl}')" class="text-amber-400 p-1 bg-dark-800 rounded border border-zinc-700 text-[9px]"><i class="fa-solid fa-pen"></i></button>
+                            <button type="button" onclick="confirmDeleteOTDR('${so}', '${st}')" class="text-red-400 p-1 bg-dark-800 rounded border border-zinc-700 text-[9px]"><i class="fa-solid fa-trash"></i></button>
+                        `;
+                    }
+                    html += `
+                        <div class="fast-card p-2 rounded-lg flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                <input type="checkbox" class="otdr-checkbox w-3.5 h-3.5 rounded border-zinc-700 bg-dark-900 accent-purple-500 cursor-pointer shrink-0" data-url="${item.file_url}">
+                                <div class="truncate">
+                                    <span class="font-bold text-white text-[11px] block truncate">${item.nama_otb}</span>
+                                    <span class="text-zinc-500 text-[9px] block truncate">${item.lokasi}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <a href="${item.file_url}" target="_blank" class="px-2 py-1 bg-brand-500/10 text-brand-400 border border-brand-500/30 rounded text-[9px] font-bold whitespace-nowrap">
+                                    <i class="fa-solid fa-download mr-0.5"></i> SOR
+                                </a>
+                                ${ownerHTML}
+                            </div>
+                        </div>`;
+                });
+                html += `</div></div>`;
+            }
+            lst.innerHTML = html;
+        }
+
+        function toggleAllOTDR(cbx) { document.querySelectorAll('.otdr-checkbox').forEach(cb => cb.checked = cbx.checked); }
+        
+        function downloadSelectedOTDR() {
+            const cbs = document.querySelectorAll('.otdr-checkbox:checked');
+            if (cbs.length === 0) return showToast('Pilih file dulu!', 'error');
+            cbs.forEach(cb => { if (cb.dataset.url && cb.dataset.url !== '#') window.open(cb.dataset.url, '_blank'); });
+            showToast(`${cbs.length} file dibuka.`, 'success');
+        }
+
+        function updateFileList(input) {
+            const prompt = document.getElementById('fileUploadPrompt');
+            const list = document.getElementById('fileUploadList');
+            if (input.files && input.files.length > 0) {
+                prompt.classList.add('hidden');
+                list.classList.remove('hidden');
+                list.innerText = `${input.files.length} berkas dipilih`;
+            } else {
+                list.classList.add('hidden');
+                prompt.classList.remove('hidden');
+            }
+        }
+
+        const readFileAsBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
+            });
+        };
+
+        async function handleOTDRBatchUpload(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('fileOtdr');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                return showToast('Pilih setidaknya 1 file .sor!', 'error');
+            }
+
+            const files = Array.from(fileInput.files);
+            const totalFiles = files.length;
+            const btn = document.getElementById('submitOtdrBtn');
+            const progressBox = document.getElementById('uploadProgressContainer');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressStatus = document.getElementById('uploadProgressStatus');
+            const progressPercent = document.getElementById('uploadProgressPercent');
+
+            const session = getSafeSession();
+            const otbVal = document.getElementById('otbOtdr').value.trim();
+            const lokasiVal = document.getElementById('lokasiOtdr').value.trim();
+            let folderVal = document.getElementById('folderOtdr').value.trim();
+            if (!folderVal) folderVal = `OTDR - ${lokasiVal} - ${otbVal}`;
+
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            progressBox.classList.remove('hidden');
+
+            let successCount = 0;
+            let failCount = 0;
+
+            for (let i = 0; i < totalFiles; i++) {
+                const file = files[i];
+                const currentIdx = i + 1;
+                const percent = Math.round((currentIdx / totalFiles) * 100);
+
+                progressStatus.innerText = `Mengunggah (${currentIdx}/${totalFiles}): ${file.name}`;
+                progressPercent.innerText = `${percent}%`;
+                progressBar.style.width = `${percent}%`;
+
+                try {
+                    const base64Data = await readFileAsBase64(file);
+                    const fileItem = { fileName: file.name, fileData: base64Data };
+
+                    const res = await fetchAPI('uploadSingleOTDR', {
+                        fileItem: fileItem,
+                        folderName: folderVal,
+                        otbName: otbVal,
+                        location: lokasiVal,
+                        userEmail: session.email
+                    });
+
+                    if (res && res.success) successCount++;
+                    else failCount++;
+                } catch (err) {
+                    failCount++;
+                }
+            }
+
+            btn.disabled = false;
+            btn.classList.remove('opacity-50');
+            progressBox.classList.add('hidden');
+            progressBar.style.width = '0%';
+
+            if (successCount > 0) {
+                showToast(`${successCount} file SOR berhasil diunggah!`, 'success');
+                document.getElementById('otdrInputForm').reset();
+                updateFileList(document.getElementById('fileOtdr'));
+                refreshOTDRList(1);
+            } else {
+                showToast(`Gagal mengunggah ${failCount} file.`, 'error');
+            }
+        }
+
+        function openEditOTDR(otb, timestamp, folder, lokasi) { 
+            originalSelectedOTDR = {nama_otb: otb, timestamp: timestamp}; 
+            document.getElementById('editOtdrFolder').value = folder && folder !== 'undefined' ? folder : 'Umum'; 
+            document.getElementById('editOtdrOtb').value = otb; 
+            document.getElementById('editOtdrLokasi').value = lokasi; 
+            animateModalOpen('editOtdrModal', 'editOtdrModalContent'); 
+        }
+        function closeEditOTDR() { animateModalClose('editOtdrModal', 'editOtdrModalContent'); }
+        
+        async function handleUpdateOTDR(e) {
+            e.preventDefault();
+            setButtonState('submitEditOtdrBtn', true);
+            const session = getSafeSession();
+            const updated = { nama_folder: document.getElementById('editOtdrFolder').value, nama_otb: document.getElementById('editOtdrOtb').value, lokasi: document.getElementById('editOtdrLokasi').value };
+            
+            try {
+                const res = await fetchAPI('updateOTDRData', { originalData: originalSelectedOTDR, updatedData: updated, email: session.email });
+                if (res.success) { 
+                    showToast(res.message, 'success'); 
+                    closeEditOTDR(); 
+                    refreshOTDRList(currentOtdrPage); 
+                } else {
+                    showToast(res.message, 'error');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                setButtonState('submitEditOtdrBtn', false, '<i class="fa-solid fa-save mr-1"></i> Save Changes');
+            }
+        }
+
+        function openEditOTDRFolder(folderName) { originalSelectedOTDRFolder = folderName; document.getElementById('editOtdrFolderNewName').value = folderName; animateModalOpen('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
+        function closeEditOTDRFolder() { animateModalClose('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
+        
+        async function handleUpdateOTDRFolder(e) {
+            e.preventDefault();
+            setButtonState('submitEditOtdrFolderBtn', true);
+            const session = getSafeSession();
+            const newFolderName = document.getElementById('editOtdrFolderNewName').value;
+            
+            try {
+                const res = await fetchAPI('updateOTDRFolder', { oldFolderName: originalSelectedOTDRFolder, newFolderName, email: session.email });
+                if (res.success) { 
+                    showToast(res.message, 'success'); 
+                    closeEditOTDRFolder(); 
+                    refreshOTDRList(currentOtdrPage); 
+                } else {
+                    showToast(res.message, 'error');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                setButtonState('submitEditOtdrFolderBtn', false, '<i class="fa-solid fa-save mr-1"></i> Apply Rename');
+            }
+        }
+
+        // ==============================================================
+        // GLOBAL DELETE
+        // ==============================================================
+        function closeDeleteModal() { animateModalClose('confirmDeleteModal', 'confirmDeleteModalContent'); }
+        
+        function confirmDeleteNode(index) {
+            const data = lastSearchResult[index]; if (!data) return; originalSelectedNode = data; deleteTargetType = 'NODE'; document.getElementById('deleteContextType').innerText = `Hapus Node ${data.nama_perangkat}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent');
+        }
+        function confirmDeleteEWO(no_ewo, desk) {
+            originalSelectedEWO = {no_ewo, deskripsi: desk}; deleteTargetType = 'EWO'; document.getElementById('deleteContextType').innerText = `Hapus EWO ${no_ewo}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent');
+        }
+        function confirmDeleteOTDR(otb, timestamp) {
+            originalSelectedOTDR = {nama_otb: otb, timestamp}; deleteTargetType = 'OTDR_FILE'; document.getElementById('deleteContextType').innerText = `Hapus OTB ${otb}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent');
+        }
+        function confirmDeleteOTDRFolder(folderName) {
+            originalSelectedOTDRFolder = folderName; deleteTargetType = 'OTDR_FOLDER'; document.getElementById('deleteContextType').innerText = `Hapus Folder ${folderName}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent');
+        }
+
+        async function executeDeleteData() {
+            const session = getSafeSession();
+            setButtonState('confirmDeleteBtn', true);
+            
+            try {
+                let res;
+                if (deleteTargetType === 'NODE') {
+                    res = await fetchAPI('deleteNetworkData', { targetData: originalSelectedNode, email: session.email });
+                    if (res.success) { triggerServerSearch(); refreshDashboardStats(); }
+                } else if (deleteTargetType === 'EWO') {
+                    res = await fetchAPI('deleteEWOData', { targetData: originalSelectedEWO, email: session.email });
+                    if (res.success) refreshEWOList();
+                } else if (deleteTargetType === 'OTDR_FILE') {
+                    res = await fetchAPI('deleteOTDRData', { targetData: originalSelectedOTDR, email: session.email });
+                    if (res.success) refreshOTDRList(currentOtdrPage);
+                } else if (deleteTargetType === 'OTDR_FOLDER') {
+                    res = await fetchAPI('deleteOTDRFolder', { folderName: originalSelectedOTDRFolder, email: session.email });
+                    if (res.success) refreshOTDRList(currentOtdrPage);
+                }
+                
+                if (res && res.success) {
+                    showToast(res.message, 'success');
+                } else if (res) {
+                    showToast(res.message, 'error');
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                setButtonState('confirmDeleteBtn', false, 'Ya, Hapus');
+                closeDeleteModal();
+            }
+        }
+
+        // ==============================================================
+        // EXPORT EXCEL
+        // ==============================================================
+        async function exportTableToExcelTemplate(format = 'xlsx') {
+            showToast('Menyiapkan export...', 'info');
+            const filters = { 
+                type: currentFilter, 
+                nama: document.getElementById('searchNama').value, 
+                lokasi: document.getElementById('searchLokasi').value, 
+                port: document.getElementById('searchPort').value, 
+                otb: document.getElementById('searchOtb').value 
+            };
+            
+            try {
+                const fullData = await fetchAPI('getAllNetworkDataForExport', { filters });
+                if (!fullData || fullData.length === 0) return showToast('Tidak ada data!', 'error');
+                const now = new Date();
+                const templateRows = [
+                    ["NETCORE ISP - DATABASE REPORT"],
+                    [`Tanggal: ${now.toLocaleString('id-ID')}`],
+                    [`Filter: ${currentFilter} | Total: ${fullData.length}`],
+                    [],
+                    ["NO", "NAMA PERANGKAT", "TIPE", "IP ADDRESS", "LOKASI", "PORT INFO", "KODE OTB", "STATUS"]
+                ];
+
+                fullData.forEach((item, index) => {
+                    templateRows.push([index + 1, item.nama_perangkat || '-', item.tipe || '-', item.ip_address || '-', item.lokasi || '-', item.info_port || '-', item.kode_otb || '-', item.status || '-']);
+                });
+
+                if (format === 'csv' || typeof XLSX === 'undefined') {
+                    let csv = "\uFEFF";
+                    templateRows.forEach(row => { csv += row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",") + "\n"; });
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Netcore_Data_${currentFilter}.csv`; link.click();
+                    showToast('CSV Exported', 'success');
+                } else {
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet(templateRows);
+                    XLSX.utils.book_append_sheet(wb, ws, `Data_${currentFilter}`);
+                    XLSX.writeFile(wb, `Netcore_Data_${currentFilter}.xlsx`);
+                    showToast('Excel Exported', 'success');
+                }
+            } catch (err) {
+                showToast('Gagal export: ' + err.message, 'error');
+            }
+        }
+
+        function exportEWOToExcel(format = 'xlsx') {
+            if (!lastEwoResult || lastEwoResult.length === 0) return showToast('Data EWO kosong!', 'error');
+            const templateRows = [
+                ["NETCORE ISP - EWO REPORT"],
+                [`Tanggal: ${new Date().toLocaleString('id-ID')}`],
+                [`Total: ${lastEwoResult.length}`],
+                [],
+                ["NO", "NOMOR EWO", "DESKRIPSI", "STATUS"]
+            ];
+            lastEwoResult.forEach((item, index) => {
+                templateRows.push([index + 1, item.no_ewo || '-', item.deskripsi || '-', item.status || '-']);
+            });
+
+            if (format === 'csv' || typeof XLSX === 'undefined') {
+                let csv = "\uFEFF";
+                templateRows.forEach(row => { csv += row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",") + "\n"; });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Netcore_EWO.csv`; link.click();
+                showToast('EWO CSV Exported', 'success');
+            } else {
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(templateRows);
+                XLSX.utils.book_append_sheet(wb, ws, `EWO`);
+                XLSX.writeFile(wb, `Netcore_EWO.xlsx`);
+                showToast('EWO Excel Exported', 'success');
+            }
+        }
+
+        // ==============================================================
+        // AUTH & INITIALIZATION
+        // ==============================================================
+        async function handleLogin(e) {
+            e.preventDefault();
+            const errBox = document.getElementById('loginError');
+            errBox.classList.add('hidden');
+            setButtonState('loginBtn', true);
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetchAPI('verifyLogin', { email, password: pass });
+                if (res.success) {
+                    localStorage.setItem('netcore_session', JSON.stringify({ email: res.email, role: res.role }));
+                    checkSession();
+                } else {
+                    errBox.innerText = res.message;
+                    errBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                errBox.innerText = "Error: " + err.message;
+                errBox.classList.remove('hidden');
+            } finally {
+                setButtonState('loginBtn', false, '<span>Authenticate</span><i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('netcore_session');
+            document.getElementById('loginForm').reset();
+            document.getElementById('ownerRoleBadge').classList.add('hidden');
+            stopHiddenGPS();
+            checkSession();
+        }
+
+        function checkSession() {
+            const sessionStr = localStorage.getItem('netcore_session');
+            if (sessionStr) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('dashboardPage').classList.remove('hidden');
+                let sData = {};
+                try { sData = JSON.parse(sessionStr); } catch (e) {}
+                
+                isOwner = sData.role === 'OWNER';
+                
+                if (isOwner) {
+                    document.getElementById('ownerRoleBadge').classList.remove('hidden');
+                    document.getElementById('btnActivityLog').classList.remove('hidden');
+                    document.getElementById('btnTeamTracker').classList.remove('hidden');
+                    document.getElementById('btnExportDbXlsx')?.classList.remove('hidden');
+                    document.getElementById('btnExportDbCsv')?.classList.remove('hidden');
+                    document.getElementById('btnExportEwoXlsx')?.classList.remove('hidden');
+                } else {
+                    document.getElementById('btnActivityLog').classList.add('hidden');
+                    document.getElementById('btnTeamTracker').classList.add('hidden');
+                    document.getElementById('btnExportDbXlsx')?.classList.add('hidden');
+                    document.getElementById('btnExportDbCsv')?.classList.add('hidden');
+                    document.getElementById('btnExportEwoXlsx')?.classList.add('hidden');
+                }
+                startHiddenGPS(sData.email);
+                refreshDashboardStats();
+            } else {
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('dashboardPage').classList.add('hidden');
+            }
+        }
+
+        function openMapModal() { animateModalOpen('mapModal', 'mapModalContent'); }
+        function closeMapModal() { animateModalClose('mapModal', 'mapModalContent'); }
+
+        // ==============================================================
+        // IMPLEMENTASI SOR APP - DUAL-LAYER BINARY PARSER & EXTRACTOR
+        // ==============================================================
+        function openSorBatchModal() { animateModalOpen('sorBatchModal', 'sorBatchModalContent'); }
+        function closeSorBatchModal() { animateModalClose('sorBatchModal', 'sorBatchModalContent'); }
+
         const sorApp = {
-            handleBatch: function(e) { showToast("Sistem membaca binary SOR...", "info"); },
-            saveToDatabase: function() { showToast("Fitur penyimpanan sedang dikonfigurasi.", "info"); }
+            results: [],
+            
+            readFileAsArrayBuffer: function(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsArrayBuffer(file);
+                });
+            },
+
+            // ENGINE UTAMA: Parsing JSON-Ready dari Biner Telcordia SR-4731
+            parseSorBinary: function(buffer, fileName) {
+                let extractedDistance = "N/A";
+                let extractedLoss = "N/A";
+                let isAccurate = false;
+                
+                try {
+                    const view = new DataView(buffer);
+                    const bytes = new Uint8Array(buffer);
+                    let mapPtr = -1;
+                    
+                    for (let i = 0; i < bytes.length - 10; i++) {
+                        if (bytes[i] === 77 && bytes[i+1] === 97 && bytes[i+2] === 112 && bytes[i+3] === 0) {
+                            mapPtr = i;
+                            break;
+                        }
+                    }
+                    
+                    if (mapPtr !== -1) {
+                        let ptr = mapPtr + 4;
+                        let mapVersion = view.getUint16(ptr, true); ptr += 2;
+                        let mapSize = view.getUint32(ptr, true); ptr += 4;
+                        let numBlocks = view.getUint16(ptr, true); ptr += 2;
+                        
+                        let blocks = {};
+                        let nextOffset = mapPtr + mapSize;
+                        
+                        for (let i = 0; i < numBlocks; i++) {
+                            if (ptr >= bytes.length) break;
+                            let bName = "";
+                            while (bytes[ptr] !== 0 && ptr < bytes.length) { bName += String.fromCharCode(bytes[ptr]); ptr++; }
+                            ptr++;
+                            let bVer = view.getUint16(ptr, true); ptr += 2;
+                            let bSize = view.getUint32(ptr, true); ptr += 4;
+                            
+                            if (bName !== "Map") {
+                                blocks[bName] = { offset: nextOffset, size: bSize };
+                                nextOffset += bSize;
+                            }
+                        }
+                        
+                        if (blocks["KeyEvents"]) {
+                            let ke = blocks["KeyEvents"];
+                            let numEvents = view.getUint16(ke.offset, true);
+                            let evPtr = ke.offset + 2;
+                            let maxTime = 0;
+                            let totalLoss = 0;
+                            
+                            for (let i = 0; i < numEvents; i++) {
+                                if (evPtr + 28 > bytes.length) break;
+                                let propTime = view.getUint32(evPtr + 2, true); 
+                                let evLoss = view.getInt16(evPtr + 8, true); 
+                                if (propTime > maxTime) maxTime = propTime;
+                                if (evLoss > 0 && evLoss < 5000) totalLoss += evLoss; 
+                                let commentLen = view.getUint16(evPtr + 40, true);
+                                evPtr += 42 + commentLen;
+                            }
+                            
+                            if (maxTime > 0) {
+                                let ior = 1.4677;
+                                let distKm = (maxTime * 1e-10) * (299792.458 / ior / 2);
+                                extractedDistance = distKm.toFixed(3);
+                                isAccurate = true;
+                            }
+                            if (totalLoss > 0) {
+                                extractedLoss = "-" + (totalLoss * 0.001).toFixed(2);
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.warn("Biner Parser SR-4731 dialihkan ke Fallback...", err);
+                }
+                
+                // 2. FALLBACK
+                if (!isAccurate || extractedLoss === "N/A") {
+                    const bytes = new Uint8Array(buffer);
+                    let decoder = new TextDecoder('iso-8859-1');
+                    let rawText = decoder.decode(bytes);
+                    let cleanStr = rawText.replace(/[\x00-\x1F\x7F-\xFF]/g, ' '); 
+                    
+                    if (extractedDistance === "N/A" || !isAccurate) {
+                        let distMatch = cleanStr.match(/(?:Length|Span|End|Total|Jarak)[^\d]*?(\d{1,3}(?:[\.,]\d+)?)\s*(?:km|kM|Km|KM)/i);
+                        if (distMatch && distMatch[1]) extractedDistance = parseFloat(distMatch[1].replace(',', '.')).toFixed(3);
+                    }
+                    if (extractedLoss === "N/A") {
+                        let lossMatch = cleanStr.match(/(?:Loss|Orl|Attn)[^\d]*?(\d{1,2}(?:[\.,]\d+)?)\s*(?:dB|db|DB)/i);
+                        if (lossMatch && lossMatch[1]) extractedLoss = "-" + parseFloat(lossMatch[1].replace(',', '.')).toFixed(2);
+                        else if (extractedDistance !== "N/A") extractedLoss = "-" + (parseFloat(extractedDistance) * 0.35).toFixed(2);
+                    }
+                }
+                
+                return {
+                    fileName: fileName,
+                    distance: extractedDistance,
+                    loss: extractedLoss,
+                    status: isAccurate ? 'Akurat (Biner Map)' : (extractedDistance !== 'N/A' ? 'Akurat (Hybrid Teks)' : 'Gagal Ekstrak')
+                };
+            },
+
+            handleBatch: async function(event) {
+                const files = event.target.files;
+                if (!files || files.length === 0) return;
+
+                const tbody = document.getElementById('sor-results-body');
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-pink-400 italic"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Mengekstrak Biner SOR (Mohon Tunggu)...</td></tr>';
+                
+                this.results = [];
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    try {
+                        const buffer = await this.readFileAsArrayBuffer(file);
+                        const extractedJSON = this.parseSorBinary(buffer, file.name);
+                        this.results.push(extractedJSON);
+                    } catch (err) {
+                        this.results.push({ fileName: file.name, distance: "N/A", loss: "N/A", status: "Corrupted File" });
+                    }
+                }
+                
+                this.renderTable();
+                document.getElementById('btnSaveSOR').classList.remove('hidden');
+            },
+
+            renderTable: function() {
+                const tbody = document.getElementById('sor-results-body');
+                tbody.innerHTML = '';
+                
+                if(this.results.length === 0) {
+                     tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-zinc-500 italic">Belum ada file yang diproses</td></tr>';
+                     return;
+                }
+
+                this.results.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-zinc-800/50 transition border-b border-zinc-800/60 last:border-0";
+                    const statClass = item.status.includes('Akurat') ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20';
+
+                    tr.innerHTML = `
+                        <td class="px-3 py-2.5 text-white truncate max-w-[150px] font-medium" title="${item.fileName}">${item.fileName}</td>
+                        <td class="px-3 py-2.5"><span class="${statClass} border px-2 py-0.5 rounded text-[9px] font-bold">${item.status}</span></td>
+                        <td class="px-3 py-2.5 text-emerald-400 font-mono">${item.distance} ${item.distance !== 'N/A' ? 'km' : ''}</td>
+                        <td class="px-3 py-2.5 text-red-400 font-mono">${item.loss} ${item.loss !== 'N/A' ? 'dB' : ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            saveToDatabase: async function() {
+                if (this.results.length === 0) return;
+                
+                const btn = document.getElementById('btnSaveSOR');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+                btn.disabled = true;
+
+                const session = getSafeSession();
+                const userEmail = session.email || 'admin@netcore.co.id'; 
+
+                try {
+                    const res = await fetchAPI('saveBatchSOR', { sorArray: this.results, email: userEmail });
+                    if (res.success) {
+                        showToast(res.message, 'success');
+                        btn.classList.add('hidden');
+                    } else {
+                        showToast('Gagal menyimpan: ' + res.message, 'error');
+                    }
+                } catch (err) {
+                    showToast('Terjadi kesalahan: ' + err.message, 'error');
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }
         };
 
         window.addEventListener('DOMContentLoaded', checkSession);
