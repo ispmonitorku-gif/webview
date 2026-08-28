@@ -84,6 +84,9 @@
                 </div>
                 <h2 class="text-2xl font-black tracking-tight text-white">NETCORE</h2>
                 <p class="text-[10px] font-medium text-zinc-400 tracking-widest uppercase mt-0.5">High Performance ISP Portal</p>
+                <div id="historyBadge" class="hidden mt-3 inline-flex items-center gap-1 bg-brand-500/10 border border-brand-500/20 text-brand-400 text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Sesi Tersimpan
+                </div>
             </div>
             
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
@@ -109,6 +112,7 @@
                     <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                 </button>
             </form>
+            <p class="text-center text-zinc-600 text-[9px] mt-6 font-medium">Sesi web valid untuk 5 jam. Menutup web akan mereset sesi.</p>
         </div>
     </div>
 
@@ -122,7 +126,7 @@
                     <i class="fa-solid fa-globe text-white"></i>
                 </div>
                 <div>
-                    <h2 class="font-black text-lg tracking-tight text-white leading-tight">NETCORE ISP</h2>
+                    <h2 class="font-black text-lg tracking-tight text-white leading-tight">NETCORE</h2>
                     <p class="text-[9px] text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"></span> Network Portal
                     </p>
@@ -167,7 +171,7 @@
             </nav>
 
             <div class="p-4 border-t border-white/10 shrink-0">
-                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 py-3 rounded-xl transition text-sm font-bold border border-red-500/20">
+                <button onclick="handleLogout(true)" class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 py-3 rounded-xl transition text-sm font-bold border border-red-500/20">
                     <i class="fa-solid fa-power-off"></i> Keluar
                 </button>
             </div>
@@ -196,7 +200,7 @@
                         <button onclick="refreshDashboardStats()" class="w-9 h-9 rounded-full bg-dark-800 border border-zinc-700/60 text-zinc-300 flex items-center justify-center active:scale-95 transition">
                             <i id="syncIconMobile" class="fa-solid fa-rotate-right text-xs"></i>
                         </button>
-                        <button onclick="handleLogout()" class="w-9 h-9 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center active:scale-95 transition">
+                        <button onclick="handleLogout(true)" class="w-9 h-9 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center active:scale-95 transition">
                             <i class="fa-solid fa-power-off text-xs"></i>
                         </button>
                     </div>
@@ -221,7 +225,6 @@
                 
                 <!-- Cards Summary -->
                 <div id="summaryCards" class="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                    <!-- Placeholder untuk skeleton loading -->
                     <div class="fast-card p-4 md:p-5 rounded-2xl h-[92px] border-l-4 border-l-brand-500 animate-pulse"></div>
                     <div class="fast-card p-4 md:p-5 rounded-2xl h-[92px] border-l-4 border-l-accent-500 animate-pulse"></div>
                     <div class="fast-card p-4 md:p-5 rounded-2xl h-[92px] border-l-4 border-l-amber-500 animate-pulse"></div>
@@ -229,7 +232,6 @@
                 </div>
 
                 <!-- CHARTS DASHBOARD -->
-                <!-- Menampilkan Chart System Overview secara profesional -->
                 <div class="fast-card p-6 rounded-2xl relative overflow-hidden w-full border border-white/10">
                     <h3 class="text-white text-sm font-bold tracking-wide flex items-center mb-5">
                         <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center mr-3 border border-indigo-500/30">
@@ -242,7 +244,6 @@
                             <div id="chartSystemOverview" class="w-full h-full"></div>
                         </div>
                         <div id="detailedStats" class="grid grid-cols-1 gap-4 text-sm w-full">
-                            <!-- Injected dari JS -->
                              <div class="bg-dark-900 h-[88px] rounded-xl border border-zinc-800 animate-pulse"></div>
                              <div class="bg-dark-900 h-[88px] rounded-xl border border-zinc-800 animate-pulse"></div>
                              <div class="bg-dark-900 h-[88px] rounded-xl border border-zinc-800 animate-pulse"></div>
@@ -265,7 +266,6 @@
                             </div>
                         </div>
                         <div id="recapDropdownPanel" class="mt-4 pt-4 border-t border-zinc-800/80 w-full hidden">
-                            <!-- Placeholder -->
                              <div class="text-center py-4 text-xs text-brand-400"><i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i>Loading Overview...</div>
                         </div>
                     </div>
@@ -326,6 +326,8 @@
         </div>
     </div>
 
+    <!-- SEMUA MODAL SAMA SEPERTI SEBELUMNYA ... -->
+    
     <!-- Mobile Menu Extra Options Modal -->
     <div id="mobileMenuModal" class="hidden fixed inset-0 z-[200] flex flex-col justify-end bg-black/80 transition-opacity duration-200">
         <div class="bg-dark-900 w-full rounded-t-[28px] border-t border-zinc-800 p-5 pb-safe">
@@ -633,7 +635,7 @@
 
     <script>
         // ==============================================================
-        // FETCH API BRIDGE (INTEGRASI 100% KOMPATIBEL DENGAN BACKEND GAS)
+        // FETCH API BRIDGE
         // ==============================================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbydbmac2A0zMqLpbqYEgjsGnhYrGqa0L-UlfKkx-1KTt5NL7pwGmQ2mRsD85IEqIQ3H/exec"; 
 
@@ -662,12 +664,18 @@
         let deleteTargetType = 'NODE';
         let originalSelectedNode = null, originalSelectedEWO = null, originalSelectedOTDR = null, originalSelectedOTDRFolder = null; 
         let gpsTrackerInterval = null;
+        let sessionTimerInterval = null; // Timer untuk mengecek limit 5 Jam
+
+        // EVENT LISTENER: Hancurkan sesi saat tab ditutup / di-refresh (Restart)
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.removeItem('netcore_session');
+        });
 
         // ==============================================================
-        // APEX CHARTS INITIALIZATION (System Overview Tunggal Terpusat)
+        // APEX CHARTS INITIALIZATION
         // ==============================================================
         function initCharts(stats) {
-            if (typeof ApexCharts === 'undefined') return; // Fallback jika gagal load
+            if (typeof ApexCharts === 'undefined') return; 
             if (systemChartInstance) systemChartInstance.destroy();
             
             const chartOpts = {
@@ -809,7 +817,7 @@
         }
 
         // ==============================================================
-        // TOAST, MODALS & UTILS (UPDATED ANIMATION)
+        // TOAST, MODALS & UTILS
         // ==============================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -883,21 +891,37 @@
         function closeSorBatchModal() { animateModalClose('sorBatchModal', 'sorBatchModalContent'); }
 
         // ==============================================================
-        // AUTHENTICATION
+        // AUTHENTICATION & SESSION MANAGEMENT
         // ==============================================================
         async function handleLogin(e) {
             e.preventDefault();
             const errBox = document.getElementById('loginError'); errBox.classList.add('hidden');
             setBtnState('loginBtn', true);
             
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
             try {
-                const res = await fetchAPI('verifyLogin', {
-                    email: document.getElementById('loginEmail').value,
-                    password: document.getElementById('loginPassword').value
-                });
+                const res = await fetchAPI('verifyLogin', { email, password });
                 
                 if (res.success) {
-                    localStorage.setItem('netcore_session', JSON.stringify({ email: res.email, role: res.role }));
+                    const now = Date.now();
+                    
+                    // 1. SESSION AKTIF (5 Jam) - Diletakkan di sessionStorage agar hilang jika direstart/ditutup
+                    sessionStorage.setItem('netcore_session', JSON.stringify({
+                        email: res.email,
+                        role: res.role,
+                        loginTime: now
+                    }));
+
+                    // 2. DEVICE HISTORY (24 Jam) - Diletakkan di localStorage untuk auto-fill form
+                    // Menggunakan btoa (Base64) untuk mengamankan karakter di penyimpanan lokal frontend
+                    localStorage.setItem('netcore_device_history', JSON.stringify({
+                        email: email,
+                        password: btoa(encodeURIComponent(password)),
+                        loginTime: now
+                    }));
+
                     checkSession();
                 } else {
                     errBox.innerText = res.message; errBox.classList.remove('hidden');
@@ -909,17 +933,70 @@
             }
         }
 
-        function handleLogout() {
-            localStorage.removeItem('netcore_session');
-            document.getElementById('loginForm').reset();
+        function handleLogout(isExpired = false) {
+            // Hapus sesi aktif
+            sessionStorage.removeItem('netcore_session');
+            // Hentikan timer & background tasks
+            clearInterval(sessionTimerInterval);
             stopHiddenGPS();
+            
+            document.getElementById('loginForm').reset();
             checkSession();
+
+            if (isExpired === true) {
+                showToast('Sesi telah direset/berakhir.', 'info');
+            }
+        }
+
+        function startSessionTimer() {
+            clearInterval(sessionTimerInterval);
+            sessionTimerInterval = setInterval(() => {
+                const sessionData = sessionStorage.getItem('netcore_session');
+                if (sessionData) {
+                    const parsed = JSON.parse(sessionData);
+                    // Jika login sudah lebih dari 5 jam (5 * 60 * 60 * 1000 ms)
+                    if (Date.now() - parsed.loginTime > 18000000) {
+                        showToast('Waktu sesi 5 jam telah habis. Silakan Login kembali.', 'error');
+                        handleLogout();
+                    }
+                }
+            }, 60000); // Cek per menit
         }
 
         function checkSession() {
-            const sessionData = localStorage.getItem('netcore_session');
+            const now = Date.now();
+
+            // CEK DEVICE HISTORY (Batas 24 Jam)
+            const deviceHistoryStr = localStorage.getItem('netcore_device_history');
+            const historyBadge = document.getElementById('historyBadge');
+            
+            if (deviceHistoryStr) {
+                const history = JSON.parse(deviceHistoryStr);
+                // Jika sudah lebih dari 24 Jam (24 * 60 * 60 * 1000 ms)
+                if (now - history.loginTime > 86400000) {
+                    localStorage.removeItem('netcore_device_history');
+                    historyBadge.classList.add('hidden');
+                } else {
+                    // Isi form otomatis, tinggal klik Authenticate
+                    document.getElementById('loginEmail').value = history.email;
+                    document.getElementById('loginPassword').value = decodeURIComponent(atob(history.password));
+                    historyBadge.classList.remove('hidden');
+                }
+            } else {
+                historyBadge.classList.add('hidden');
+            }
+
+            // CEK AKTIVASI SESI (Batas 5 Jam)
+            const sessionData = sessionStorage.getItem('netcore_session');
+            
             if (sessionData) {
                 const parsed = JSON.parse(sessionData);
+                
+                if (now - parsed.loginTime > 18000000) {
+                    handleLogout(true);
+                    return;
+                }
+
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('dashboardWrapper').classList.remove('hidden');
                 
@@ -942,6 +1019,7 @@
                 
                 document.getElementById('currentDateDesktop').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 
+                startSessionTimer(); // Mulai timer 5 jam
                 startHiddenGPS(parsed.email);
                 refreshDashboardStats();
             } else {
@@ -951,6 +1029,9 @@
                 systemChartInstance = null;
             }
         }
+
+        // INIT LOAD
+        window.addEventListener('load', checkSession);
 
         // ==============================================================
         // NODE EXPLORER & CRUD (PERBAIKAN PAYLOAD SEARCH SERVER)
@@ -977,7 +1058,6 @@
                     otb: document.getElementById('searchOtb').value
                 };
                 try {
-                    // MENGIRIM PAYLOAD { filters } YANG BENAR AGAR DITERIMA BACKEND SECARA VALID
                     const data = await fetchAPI('searchNetworkData', { filters });
                     renderDatabaseList(data);
                 } catch (err) {
@@ -1040,7 +1120,7 @@
         async function handleInputData(e) {
             e.preventDefault();
             setBtnState('submitInputBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const dataObj = { 
                 nama_perangkat: document.getElementById('inputNama').value, 
                 tipe: document.getElementById('inputTipe').value, 
@@ -1077,7 +1157,7 @@
         async function handleUpdateData(e) {
             e.preventDefault();
             setBtnState('submitEditBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const updatedData = { 
                 nama_perangkat: document.getElementById('editNama').value, tipe: document.getElementById('editTipe').value, 
                 ip_address: document.getElementById('editIp').value || '-', lokasi: document.getElementById('editLokasi').value, 
@@ -1125,7 +1205,7 @@
 
         async function handleEWOInput(e) {
             e.preventDefault(); setBtnState('submitEwoBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const dataObj = { no_ewo: document.getElementById('noEwo').value, deskripsi: document.getElementById('deskEwo').value, status: document.getElementById('statEwo').value };
             try {
                 const res = await fetchAPI('insertEWOData', { dataObj, email: session.email });
@@ -1140,7 +1220,7 @@
         
         async function handleUpdateEWO(e) {
             e.preventDefault(); setBtnState('submitEditEwoBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const updated = { no_ewo: document.getElementById('editEwoNo').value, deskripsi: document.getElementById('editEwoDesk').value, status: document.getElementById('editEwoStat').value };
             try {
                 const res = await fetchAPI('updateEWOData', { originalData: originalSelectedEWO, updatedData: updated, email: session.email });
@@ -1243,7 +1323,7 @@
             const btn = document.getElementById('submitOtdrBtn');
             const progressBox = document.getElementById('uploadProgressContainer'); const progressBar = document.getElementById('uploadProgressBar');
             const progressStatus = document.getElementById('uploadProgressStatus'); const progressPercent = document.getElementById('uploadProgressPercent');
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const otbVal = document.getElementById('otbOtdr').value.trim(); const lokasiVal = document.getElementById('lokasiOtdr').value.trim();
             let folderVal = document.getElementById('folderOtdr').value.trim(); if (!folderVal) folderVal = `OTDR - ${lokasiVal} - ${otbVal}`;
 
@@ -1270,7 +1350,7 @@
         function closeEditOTDR() { animateModalClose('editOtdrModal', 'editOtdrModalContent'); }
         async function handleUpdateOTDR(e) {
             e.preventDefault(); setBtnState('submitEditOtdrBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const updated = { nama_folder: document.getElementById('editOtdrFolder').value, nama_otb: document.getElementById('editOtdrOtb').value, lokasi: document.getElementById('editOtdrLokasi').value };
             try {
                 const res = await fetchAPI('updateOTDRData', { originalData: originalSelectedOTDR, updatedData: updated, email: session.email });
@@ -1283,7 +1363,7 @@
         function closeEditOTDRFolder() { animateModalClose('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
         async function handleUpdateOTDRFolder(e) {
             e.preventDefault(); setBtnState('submitEditOtdrFolderBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const newFolderName = document.getElementById('editOtdrFolderNewName').value;
             try {
                 const res = await fetchAPI('updateOTDRFolder', { oldFolderName: originalSelectedOTDRFolder, newFolderName, email: session.email });
@@ -1302,7 +1382,7 @@
         function confirmDeleteOTDRFolder(folderName) { originalSelectedOTDRFolder = folderName; deleteTargetType = 'OTDR_FOLDER'; document.getElementById('deleteContextType').innerText = `Hapus Folder ${folderName}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
 
         async function executeDeleteData() {
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             setBtnState('confirmDeleteBtn', true);
             try {
                 let res;
@@ -1334,7 +1414,7 @@
             const syncIcon = document.getElementById('trackerSyncIcon'); const container = document.getElementById('trackerContainer');
             if (syncIcon) syncIcon.classList.add('fa-spin'); container.innerHTML = '<div class="text-center py-8 text-emerald-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
             try {
-                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+                const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
                 const data = await fetchAPI('getLocations', { email: session.email });
                 if (!data || data.length === 0) { container.innerHTML = '<div class="text-center text-sm text-zinc-500 py-6">Belum ada lokasi terekam.</div>'; return; }
                 let html = '';
@@ -1359,7 +1439,7 @@
             animateModalOpen('activityLogModal', 'activityLogModalContent');
             const container = document.getElementById('activityLogContainer'); container.innerHTML = '<div class="text-center py-8 text-blue-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
             try {
-                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+                const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
                 const data = await fetchAPI('getActivityLogs', { email: session.email });
                 if (!data || data.length === 0) { container.innerHTML = '<div class="text-center text-sm text-zinc-500 py-6">Belum ada log.</div>'; return; }
                 let html = '';
@@ -1486,7 +1566,7 @@
             saveToDatabase: async function() {
                 if (this.results.length === 0) return;
                 setBtnState('btnSaveSOR', true, '<i class="fa-solid fa-database mr-2"></i> Simpan Ekstraksi ke Database Master');
-                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+                const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
                 try {
                     const res = await fetchAPI('saveBatchSOR', { sorArray: this.results, email: session.email || 'admin@netcore.co.id' });
                     if (res.success) { showToast(res.message, 'success'); document.getElementById('btnSaveSOR').classList.add('hidden'); } else showToast('Gagal menyimpan: ' + res.message, 'error');
@@ -1498,4 +1578,5 @@
     </script>
 </body>
 </html>
+
 ```eof
