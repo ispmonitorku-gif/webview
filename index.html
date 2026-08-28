@@ -549,7 +549,7 @@
         </div>
     </div>
     
-    <!-- Confirm Delete Modal (Tetap) -->
+    <!-- Confirm Delete Modal (Telah disesuaikan transisinya) -->
     <div id="confirmDeleteModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0">
         <div id="confirmDeleteModalContent" class="bg-dark-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl transition-transform duration-200 transform scale-95 mx-auto">
             <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center text-red-500 mx-auto mb-4"><i class="fa-solid fa-trash-can text-3xl"></i></div>
@@ -562,7 +562,7 @@
         </div>
     </div>
     
-    <!-- Modal Edit Form Node/EWO/OTDR (Digabungkan ke satu template logis seperti original) -->
+    <!-- Modal Edit Form Node/EWO/OTDR -->
     <div id="editModal" class="hidden fixed inset-0 z-[110] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0 backdrop-blur-sm">
         <div id="editModalContent" class="bg-dark-900 w-full md:max-w-lg mx-auto md:rounded-3xl rounded-t-[28px] border border-amber-500/30 flex flex-col max-h-[90vh] transition-transform duration-200 transform translate-y-full shadow-2xl">
             <div class="px-6 py-4 border-b border-zinc-800 flex justify-between items-center">
@@ -667,6 +667,7 @@
         // APEX CHARTS INITIALIZATION (System Overview Tunggal Terpusat)
         // ==============================================================
         function initCharts(stats) {
+            if (typeof ApexCharts === 'undefined') return; // Fallback jika gagal load
             if (systemChartInstance) systemChartInstance.destroy();
             
             const chartOpts = {
@@ -683,8 +684,11 @@
                 dataLabels: { enabled: true, style: { fontSize: '12px', colors: ['#fff'] }, dropShadow: { enabled: true } }
             };
             
-            systemChartInstance = new ApexCharts(document.querySelector("#chartSystemOverview"), chartOpts);
-            systemChartInstance.render();
+            const chartDom = document.querySelector("#chartSystemOverview");
+            if (chartDom) {
+                systemChartInstance = new ApexCharts(chartDom, chartOpts);
+                systemChartInstance.render();
+            }
         }
 
         // ==============================================================
@@ -699,11 +703,9 @@
             try {
                 const stats = await fetchAPI('getDashboardStats');
                 renderDashboardStats(stats);
-                initCharts(stats); // Update single chart
+                initCharts(stats);
                 
-                // Panggil recap dan render di background
                 fetchAPI('getRecapStats').then(renderRecapPanel).catch(e => console.error(e));
-                
                 showToast('Dashboard Tersinkronisasi', 'success');
             } catch (err) {
                 showToast('Gagal Sinkronisasi: ' + err.message, 'error');
@@ -807,7 +809,7 @@
         }
 
         // ==============================================================
-        // TOAST, MODALS & UTILS
+        // TOAST, MODALS & UTILS (UPDATED ANIMATION)
         // ==============================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -837,11 +839,22 @@
         function animateModalOpen(modalId, contentId) {
             const modal = document.getElementById(modalId); const content = document.getElementById(contentId);
             modal.classList.remove('hidden'); document.body.style.overflow = 'hidden';
-            requestAnimationFrame(() => { modal.classList.remove('opacity-0'); if (content) content.classList.remove('translate-y-full'); });
+            requestAnimationFrame(() => { 
+                modal.classList.remove('opacity-0'); 
+                if (content) {
+                    content.classList.remove('translate-y-full');
+                    content.classList.remove('scale-95');
+                }
+            });
         }
+        
         function animateModalClose(modalId, contentId) {
             const modal = document.getElementById(modalId); const content = document.getElementById(contentId);
-            modal.classList.add('opacity-0'); if (content) content.classList.add('translate-y-full');
+            modal.classList.add('opacity-0'); 
+            if (content) {
+                if (modalId === 'confirmDeleteModal' || modalId.includes('edit')) content.classList.add('scale-95'); 
+                else content.classList.add('translate-y-full'); 
+            }
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = ''; }, 200);
         }
         
@@ -940,7 +953,7 @@
         }
 
         // ==============================================================
-        // NODE EXPLORER & CRUD
+        // NODE EXPLORER & CRUD (PERBAIKAN PAYLOAD SEARCH SERVER)
         // ==============================================================
         function setModalFilter(type) {
             currentFilter = type;
@@ -964,7 +977,8 @@
                     otb: document.getElementById('searchOtb').value
                 };
                 try {
-                    const data = await fetchAPI('searchNetworkData', filters);
+                    // MENGIRIM PAYLOAD { filters } YANG BENAR AGAR DITERIMA BACKEND SECARA VALID
+                    const data = await fetchAPI('searchNetworkData', { filters });
                     renderDatabaseList(data);
                 } catch (err) {
                     showToast(err.message, 'error');
@@ -1074,7 +1088,7 @@
                 if (res.success) { showToast(res.message, 'success'); toggleEditModal(); triggerServerSearch(); refreshDashboardStats(); } 
                 else showToast(res.message, 'error');
             } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('submitEditBtn', false, '<i class="fa-solid fa-save mr-1"></i> Apply Changes'); }
+            finally { setBtnState('submitEditBtn', false, '<i class="fa-solid fa-save"></i> Apply Changes'); }
         }
 
         // ==============================================================
@@ -1484,3 +1498,4 @@
     </script>
 </body>
 </html>
+```eof
