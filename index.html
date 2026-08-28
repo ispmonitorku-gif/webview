@@ -123,11 +123,12 @@
         <aside class="w-64 fast-glass hidden md:flex flex-col flex-shrink-0 z-50 border-r border-white/10 h-full">
             <div class="p-6 flex items-center gap-3 border-b border-white/10 shrink-0">
                 <div class="w-10 h-10 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-neon-blue">
-                    <i class="fa-solid fa-globe text-white"></i>
+                    <!-- ICON ROKET MENGGANTIKAN GLOBE -->
+                    <i class="fa-solid fa-rocket text-white"></i>
                 </div>
                 <div>
-                    <h2 class="font-black text-lg tracking-tight text-white leading-tight">NETCORE ISP MONITOR</h2>
-                    <p class="text-[9px] text-zinc-200 uppercase tracking-widest flex items-center gap-1.5">
+                    <h2 class="font-black text-lg tracking-tight text-white leading-tight">NETCORE</h2>
+                    <p class="text-[9px] text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"></span> Network Portal
                     </p>
                 </div>
@@ -141,7 +142,7 @@
                 <button onclick="openDatabaseModal('All')" class="sidebar-item">
                     <i class="fa-solid fa-database w-5 text-purple-400 text-center"></i> Server Database
                 </button>
-                <button onclick="toggleInputModal()" class="sidebar-item">
+                <button id="menuAddNodeDesk" onclick="toggleInputModal()" class="sidebar-item hidden">
                     <i class="fa-solid fa-server w-5 text-emerald-400 text-center"></i> Register Node
                 </button>
                 
@@ -185,14 +186,15 @@
                 <div class="flex justify-between items-center px-4 py-3.5">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-full flex items-center justify-center shadow-neon-blue">
-                            <i class="fa-solid fa-globe text-white text-xs"></i>
+                            <!-- ICON ROKET MENGGANTIKAN GLOBE -->
+                            <i class="fa-solid fa-rocket text-white text-xs"></i>
                         </div>
                         <div>
                             <h1 class="text-base font-bold tracking-tight text-white leading-none mb-1">Netcore ISP</h1>
                             <div class="flex items-center gap-2">
                                 <span class="w-1.5 h-1.5 rounded-full bg-accent-500 animate-pulse"></span>
                                 <span class="text-zinc-400 text-[9px] font-medium tracking-wider uppercase leading-none">Medan Network</span>
-                                <span id="ownerRoleBadge" class="hidden px-1.5 py-0.5 text-[8px] font-black bg-amber-400 text-black rounded tracking-wider">OWNER</span>
+                                <span id="userRoleBadgeMob" class="hidden"></span>
                             </div>
                         </div>
                     </div>
@@ -213,7 +215,7 @@
                     <h1 class="text-2xl font-bold text-white mb-1">System Overview</h1>
                     <div class="flex items-center gap-2 text-xs text-zinc-400">
                         <i class="fa-regular fa-calendar"></i> <span id="currentDateDesktop"></span>
-                        <span id="ownerRoleBadgeDesktop" class="hidden ml-2 px-2 py-0.5 text-[9px] font-black bg-amber-400 text-black rounded uppercase tracking-wider">OWNER MODE</span>
+                        <span id="userRoleBadgeDesk" class="hidden"></span>
                     </div>
                 </div>
                 <button onclick="refreshDashboardStats()" class="fast-card hover:bg-zinc-800 px-4 py-2.5 rounded-xl flex items-center gap-2 transition text-sm font-semibold text-white border border-white/10">
@@ -306,19 +308,20 @@
             <!-- Bottom Navigation Bar Khusus Mobile -->
             <nav class="fixed bottom-0 left-0 right-0 z-[90] nav-safe pt-2 md:hidden pointer-events-none">
                 <div class="mx-3 bg-dark-900/95 border border-white/10 shadow-2xl rounded-2xl p-1 flex justify-between items-center backdrop-blur-xl pointer-events-auto">
-                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center justify-center w-1/4 py-2 text-brand-400 active:scale-90 transition">
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex-1 flex flex-col items-center justify-center py-2 text-brand-400 active:scale-90 transition">
                         <i class="fa-solid fa-house mb-0.5 text-base"></i><span class="text-[9px] font-semibold">Home</span>
                     </button>
-                    <button onclick="toggleInputModal()" class="flex flex-col items-center justify-center w-1/4 py-2 text-zinc-400 active:scale-90 transition">
+                    <!-- Tombol Add Node (Mobile) yang akan dinamis disembunyikan untuk User -->
+                    <button id="menuAddNodeMob" onclick="toggleInputModal()" class="flex-1 hidden flex-col items-center justify-center py-2 text-zinc-400 active:scale-90 transition">
                         <i class="fa-solid fa-square-plus mb-0.5 text-base"></i><span class="text-[9px] font-medium">Add Node</span>
                     </button>
-                    <button onclick="toggleEWOModal()" class="flex flex-col items-center justify-center w-1/4 py-2 text-zinc-400 active:scale-90 transition">
+                    <button onclick="toggleEWOModal()" class="flex-1 flex flex-col items-center justify-center py-2 text-zinc-400 active:scale-90 transition">
                         <i class="fa-solid fa-file-signature mb-0.5 text-base"></i><span class="text-[9px] font-medium">EWO</span>
                     </button>
-                    <button onclick="toggleOTDRModal()" class="flex flex-col items-center justify-center w-1/4 py-2 text-zinc-400 active:scale-90 transition">
+                    <button onclick="toggleOTDRModal()" class="flex-1 flex flex-col items-center justify-center py-2 text-zinc-400 active:scale-90 transition">
                         <i class="fa-solid fa-chart-area mb-0.5 text-base"></i><span class="text-[9px] font-medium">OTDR</span>
                     </button>
-                    <button onclick="document.getElementById('mobileMenuModal').classList.remove('hidden')" class="flex flex-col items-center justify-center w-1/4 py-2 text-zinc-400 active:scale-90 transition">
+                    <button onclick="document.getElementById('mobileMenuModal').classList.remove('hidden')" class="flex-1 flex flex-col items-center justify-center py-2 text-zinc-400 active:scale-90 transition">
                         <i class="fa-solid fa-bars mb-0.5 text-base"></i><span class="text-[9px] font-medium">Menu</span>
                     </button>
                 </div>
@@ -431,7 +434,7 @@
                 <div class="flex gap-2"><button id="btnExportEwoXlsx" onclick="exportEWOToExcel('xlsx')" class="hidden text-[10px] bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition">Export</button><button onclick="toggleEWOModal()" class="w-8 h-8 bg-dark-800 hover:bg-dark-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark text-sm"></i></button></div>
             </div>
             <div class="p-6 overflow-y-auto scrollbar-hide flex-1 space-y-5">
-                <form id="ewoInputForm" onsubmit="handleEWOInput(event)" class="space-y-3 fast-card p-4 rounded-xl border border-white/5 shadow-inner">
+                <form id="ewoInputForm" onsubmit="handleEWOInput(event)" class="hidden space-y-3 fast-card p-4 rounded-xl border border-white/5 shadow-inner">
                     <div class="grid grid-cols-2 gap-3"><div class="space-y-1.5"><label class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">No EWO</label><input type="text" id="noEwo" required class="w-full fast-input rounded-xl p-3 text-sm text-white"></div><div class="space-y-1.5"><label class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">Status</label><select id="statEwo" required class="w-full fast-input rounded-xl p-3 text-sm text-white"><option value="Not Done">Not Done</option><option value="Done">Done</option></select></div></div>
                     <div class="space-y-1.5"><label class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">Job Description</label><input type="text" id="deskEwo" required class="w-full fast-input rounded-xl p-3 text-sm text-white"></div>
                     <button type="submit" id="submitEwoBtn" class="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition shadow-[0_0_15px_rgba(245,158,11,0.3)] text-sm mt-2"><i class="fa-solid fa-plus mr-1"></i> Create EWO</button>
@@ -449,7 +452,7 @@
                 <button onclick="toggleOTDRModal()" class="w-8 h-8 bg-dark-800 hover:bg-dark-700 rounded-lg flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
             <div class="p-6 overflow-y-auto scrollbar-hide flex-1 space-y-5">
-                <form id="otdrInputForm" onsubmit="handleOTDRBatchUpload(event)" class="space-y-3 fast-card p-4 rounded-xl border border-purple-500/20 shadow-inner">
+                <form id="otdrInputForm" onsubmit="handleOTDRBatchUpload(event)" class="hidden space-y-3 fast-card p-4 rounded-xl border border-purple-500/20 shadow-inner">
                     <div class="space-y-1.5"><label class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">Folder Name</label><input type="text" id="folderOtdr" class="w-full fast-input rounded-xl p-3 text-sm text-white" placeholder="Opsional: Otomatis Dibuat"></div>
                     <div class="grid grid-cols-2 gap-3"><div class="space-y-1.5"><label class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">OTB Name</label><input type="text" id="otbOtdr" required class="w-full fast-input rounded-xl p-3 text-sm text-white"></div><div class="space-y-1.5"><label class="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">Location</label><input type="text" id="lokasiOtdr" required class="w-full fast-input rounded-xl p-3 text-sm text-white"></div></div>
                     <div class="space-y-1.5">
@@ -551,7 +554,7 @@
         </div>
     </div>
     
-    <!-- Confirm Delete Modal (Telah disesuaikan transisinya) -->
+    <!-- Confirm Delete Modal -->
     <div id="confirmDeleteModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-200 opacity-0">
         <div id="confirmDeleteModalContent" class="bg-dark-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl transition-transform duration-200 transform scale-95 mx-auto">
             <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center text-red-500 mx-auto mb-4"><i class="fa-solid fa-trash-can text-3xl"></i></div>
@@ -650,25 +653,27 @@
             const result = await response.json();
             if (result.error === true || result.success === false) throw new Error(result.message || "Terjadi kesalahan pada server");
             
-            // Fallback cerdas: Jika result.data tidak ada, coba parsing langsung keseluruhan data
             return result.data !== undefined ? result.data : result;
         };
 
-        // Variabel Status Global
+        // Variabel Status & Role Global
         let currentFilter = 'All';
         let searchTimeout = null;
         let lastSearchResult = []; 
         let lastEwoResult = []; 
         let currentOtdrPage = 1, totalOtdrPages = 1;
-        let isOwner = false;
         let systemChartInstance = null;
+        
+        // RBAC Identifiers
+        let userRole = 'USER';
+        let isOwner = false;
+        let isAdmin = false;
         
         let deleteTargetType = 'NODE';
         let originalSelectedNode = null, originalSelectedEWO = null, originalSelectedOTDR = null, originalSelectedOTDRFolder = null; 
         let gpsTrackerInterval = null;
-        let sessionTimerInterval = null; // Timer untuk mengecek limit 5 Jam
+        let sessionTimerInterval = null;
 
-        // EVENT LISTENER: Hancurkan sesi saat tab ditutup / di-refresh (Restart)
         window.addEventListener('beforeunload', () => {
             sessionStorage.removeItem('netcore_session');
         });
@@ -893,7 +898,7 @@
         function closeSorBatchModal() { animateModalClose('sorBatchModal', 'sorBatchModalContent'); }
 
         // ==============================================================
-        // AUTHENTICATION & SESSION MANAGEMENT
+        // AUTHENTICATION, ROLES & SESSION MANAGEMENT
         // ==============================================================
         async function handleLogin(e) {
             e.preventDefault();
@@ -908,21 +913,8 @@
                 
                 if (res.success) {
                     const now = Date.now();
-                    
-                    // 1. SESSION AKTIF (5 Jam) - Diletakkan di sessionStorage agar hilang jika direstart/ditutup
-                    sessionStorage.setItem('netcore_session', JSON.stringify({
-                        email: res.email,
-                        role: res.role,
-                        loginTime: now
-                    }));
-
-                    // 2. DEVICE HISTORY (24 Jam) - Diletakkan di localStorage untuk auto-fill form
-                    localStorage.setItem('netcore_device_history', JSON.stringify({
-                        email: email,
-                        password: btoa(encodeURIComponent(password)),
-                        loginTime: now
-                    }));
-
+                    sessionStorage.setItem('netcore_session', JSON.stringify({ email: res.email, role: res.role, loginTime: now }));
+                    localStorage.setItem('netcore_device_history', JSON.stringify({ email: email, password: btoa(encodeURIComponent(password)), loginTime: now }));
                     checkSession();
                 } else {
                     errBox.innerText = res.message; errBox.classList.remove('hidden');
@@ -942,9 +934,7 @@
             document.getElementById('loginForm').reset();
             checkSession();
 
-            if (isExpired === true) {
-                showToast('Sesi telah direset/berakhir.', 'info');
-            }
+            if (isExpired === true) showToast('Sesi telah direset/berakhir.', 'info');
         }
 
         function startSessionTimer() {
@@ -953,25 +943,21 @@
                 const sessionData = sessionStorage.getItem('netcore_session');
                 if (sessionData) {
                     const parsed = JSON.parse(sessionData);
-                    // Jika login sudah lebih dari 5 jam (5 * 60 * 60 * 1000 ms)
                     if (Date.now() - parsed.loginTime > 18000000) {
-                        showToast('Waktu sesi 5 jam telah habis. Silakan Login kembali.', 'error');
+                        showToast('Waktu sesi 5 jam habis. Silakan Login kembali.', 'error');
                         handleLogout();
                     }
                 }
-            }, 60000); // Cek per menit
+            }, 60000); 
         }
 
         function checkSession() {
             const now = Date.now();
-
-            // CEK DEVICE HISTORY (Batas 24 Jam)
             const deviceHistoryStr = localStorage.getItem('netcore_device_history');
             const historyBadge = document.getElementById('historyBadge');
             
             if (deviceHistoryStr) {
                 const history = JSON.parse(deviceHistoryStr);
-                // Jika sudah lebih dari 24 Jam
                 if (now - history.loginTime > 86400000) {
                     localStorage.removeItem('netcore_device_history');
                     historyBadge.classList.add('hidden');
@@ -984,41 +970,55 @@
                 historyBadge.classList.add('hidden');
             }
 
-            // CEK AKTIVASI SESI (Batas 5 Jam)
             const sessionData = sessionStorage.getItem('netcore_session');
-            
             if (sessionData) {
                 const parsed = JSON.parse(sessionData);
                 
-                if (now - parsed.loginTime > 18000000) {
-                    handleLogout(true);
-                    return;
-                }
+                if (now - parsed.loginTime > 18000000) { handleLogout(true); return; }
 
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('dashboardWrapper').classList.remove('hidden');
                 
-                isOwner = parsed.role === 'OWNER';
+                // MENGATUR RULES SESUAI ROLE (RBAC)
+                userRole = (parsed.role || 'USER').toUpperCase();
+                isOwner = userRole === 'OWNER';
+                isAdmin = userRole === 'ADMIN' || isOwner;
+
+                // Konfigurasi Badge Teks
+                const badgeMob = document.getElementById('userRoleBadgeMob');
+                const badgeDesk = document.getElementById('userRoleBadgeDesk');
                 
-                if (isOwner) {
-                    document.getElementById('ownerRoleBadge').classList.remove('hidden');
-                    document.getElementById('ownerRoleBadgeDesktop').classList.remove('hidden');
-                    document.getElementById('desktopOwnerMenus').classList.remove('hidden');
-                    document.getElementById('btnMobTracker').classList.remove('hidden');
-                    document.getElementById('btnMobActivity').classList.remove('hidden');
-                    if(document.getElementById('btnExportDbXlsx')) document.getElementById('btnExportDbXlsx').classList.remove('hidden');
-                    if(document.getElementById('btnExportDbCsv')) document.getElementById('btnExportDbCsv').classList.remove('hidden');
-                    if(document.getElementById('btnExportEwoXlsx')) document.getElementById('btnExportEwoXlsx').classList.remove('hidden');
-                } else {
-                    if(document.getElementById('btnExportDbXlsx')) document.getElementById('btnExportDbXlsx').classList.add('hidden');
-                    if(document.getElementById('btnExportDbCsv')) document.getElementById('btnExportDbCsv').classList.add('hidden');
-                    if(document.getElementById('btnExportEwoXlsx')) document.getElementById('btnExportEwoXlsx').classList.add('hidden');
-                }
+                badgeMob.innerText = userRole;
+                badgeDesk.innerText = userRole + " MODE";
                 
+                const badgeColor = isOwner ? 'bg-amber-400' : (isAdmin ? 'bg-blue-400' : 'bg-zinc-400');
+                badgeMob.className = `ml-2 px-1.5 py-0.5 text-[8px] font-black text-black rounded tracking-wider uppercase ${badgeColor}`;
+                badgeDesk.className = `ml-2 px-2 py-0.5 text-[9px] font-black text-black rounded tracking-wider uppercase ${badgeColor}`;
+
+                // Fungsi bantuan untuk show/hide berdasarkan role
+                const toggleVisibility = (id, show) => { 
+                    const el = document.getElementById(id); 
+                    if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); 
+                };
+                
+                // 1. Toggles Untuk ADMIN (bisa input form & export)
+                toggleVisibility('menuAddNodeDesk', isAdmin);
+                toggleVisibility('menuAddNodeMob', isAdmin);
+                toggleVisibility('ewoInputForm', isAdmin);
+                toggleVisibility('otdrInputForm', isAdmin);
+                toggleVisibility('btnExportDbXlsx', isAdmin);
+                toggleVisibility('btnExportDbCsv', isAdmin);
+                toggleVisibility('btnExportEwoXlsx', isAdmin);
+
+                // 2. Toggles Khusus OWNER (GPS & Activity Log)
+                toggleVisibility('desktopOwnerMenus', isOwner);
+                toggleVisibility('btnMobTracker', isOwner);
+                toggleVisibility('btnMobActivity', isOwner);
+
                 document.getElementById('currentDateDesktop').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 
-                startSessionTimer(); // Mulai timer 5 jam
-                startHiddenGPS(parsed.email);
+                startSessionTimer();
+                startHiddenGPS(parsed.email); // User & Admin akan tetap mengirim data lokasi di latar belakang jika browser izin
                 refreshDashboardStats();
             } else {
                 document.getElementById('loginPage').classList.remove('hidden');
@@ -1028,7 +1028,6 @@
             }
         }
 
-        // INIT LOAD
         window.addEventListener('load', checkSession);
 
         // ==============================================================
@@ -1036,9 +1035,7 @@
         // ==============================================================
         function setModalFilter(type) {
             currentFilter = type;
-            document.querySelectorAll('.modal-filter-btn').forEach(btn => {
-                btn.className = 'modal-filter-btn inactive shrink-0';
-            });
+            document.querySelectorAll('.modal-filter-btn').forEach(btn => { btn.className = 'modal-filter-btn inactive shrink-0'; });
             const activeBtn = document.getElementById('modal-btn-' + type);
             if (activeBtn) activeBtn.className = 'modal-filter-btn active shrink-0';
             triggerServerSearch();
@@ -1048,21 +1045,12 @@
             clearTimeout(searchTimeout);
             document.getElementById('serverLoadingIndicator').classList.remove('hidden');
             searchTimeout = setTimeout(async () => {
-                const filters = {
-                    type: currentFilter,
-                    nama: document.getElementById('searchNama').value,
-                    lokasi: document.getElementById('searchLokasi').value,
-                    port: document.getElementById('searchPort').value,
-                    otb: document.getElementById('searchOtb').value
-                };
+                const filters = { type: currentFilter, nama: document.getElementById('searchNama').value, lokasi: document.getElementById('searchLokasi').value, port: document.getElementById('searchPort').value, otb: document.getElementById('searchOtb').value };
                 try {
                     const data = await fetchAPI('searchNetworkData', { filters });
                     renderDatabaseList(data);
-                } catch (err) {
-                    showToast(err.message, 'error');
-                } finally {
-                    document.getElementById('serverLoadingIndicator').classList.add('hidden');
-                }
+                } catch (err) { showToast(err.message, 'error'); } 
+                finally { document.getElementById('serverLoadingIndicator').classList.add('hidden'); }
             }, 300);
         }
 
@@ -1070,9 +1058,7 @@
             lastSearchResult = data || [];
             const container = document.getElementById('data-list-container');
             const emptyState = document.getElementById('emptyState');
-            if (!data || data.length === 0) {
-                container.innerHTML = ''; emptyState.classList.remove('hidden'); return;
-            }
+            if (!data || data.length === 0) { container.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
             emptyState.classList.add('hidden');
             let h = '';
             for (let i = 0; i < data.length; i++) {
@@ -1085,7 +1071,7 @@
                 if (x.status === 'Offline') { sc = 'text-red-400 bg-red-500/10 border-red-500/30'; dot = 'bg-red-500'; }
                 else if (x.status === 'Warning') { sc = 'text-amber-400 bg-amber-500/10 border-amber-500/30'; dot = 'bg-amber-500'; }
 
-                const ownerActions = isOwner ? `
+                const actionButtons = isAdmin ? `
                     <div class="flex gap-2 mt-2 pt-2 border-t border-zinc-800">
                         <button onclick="openEditModal(${i})" class="flex-1 bg-dark-800 hover:bg-dark-700 text-amber-400 border border-zinc-700 text-[10px] font-bold py-1.5 rounded-lg transition"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
                         <button onclick="confirmDeleteNode(${i})" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] font-bold py-1.5 rounded-lg transition"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
@@ -1109,7 +1095,7 @@
                         <span class="text-zinc-400 font-bold"><i class="fa-solid fa-barcode text-orange-400 mr-1.5"></i>KODE OTB</span>
                         <span class="font-mono text-white font-bold bg-dark-800 px-1.5 py-0.5 rounded">${x.kode_otb || '-'}</span>
                     </div>
-                    ${ownerActions}
+                    ${actionButtons}
                 </div>`;
             }
             container.innerHTML = h;
@@ -1117,26 +1103,15 @@
 
         async function handleInputData(e) {
             e.preventDefault();
+            if (!isAdmin) return showToast('Akses ditolak: Memerlukan izin Admin', 'error');
+            
             setBtnState('submitInputBtn', true);
             const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
-            const dataObj = { 
-                nama_perangkat: document.getElementById('inputNama').value, 
-                tipe: document.getElementById('inputTipe').value, 
-                ip_address: document.getElementById('inputIp').value || '-', 
-                lokasi: document.getElementById('inputLokasi').value, 
-                info_port: document.getElementById('inputPort').value || '-', 
-                kode_otb: document.getElementById('inputOtb').value || '-', 
-                status: document.getElementById('inputStatus').value 
-            };
+            const dataObj = { nama_perangkat: document.getElementById('inputNama').value, tipe: document.getElementById('inputTipe').value, ip_address: document.getElementById('inputIp').value || '-', lokasi: document.getElementById('inputLokasi').value, info_port: document.getElementById('inputPort').value || '-', kode_otb: document.getElementById('inputOtb').value || '-', status: document.getElementById('inputStatus').value };
             try {
                 const res = await fetchAPI('insertNetworkData', { dataObj, email: session.email });
-                if (res.success) { 
-                    showToast(res.message, 'success'); 
-                    document.getElementById('manualInputForm').reset(); 
-                    toggleInputModal(); 
-                    refreshDashboardStats(); 
-                    triggerServerSearch(); 
-                } else showToast(res.message, 'error');
+                if (res.success) { showToast(res.message, 'success'); document.getElementById('manualInputForm').reset(); toggleInputModal(); refreshDashboardStats(); triggerServerSearch(); } 
+                else showToast(res.message, 'error');
             } catch (err) { showToast(err.message, 'error'); } 
             finally { setBtnState('submitInputBtn', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Save Node Configuration'); }
         }
@@ -1144,23 +1119,19 @@
         function toggleEditModal() { const m = document.getElementById('editModal'); m.classList.contains('hidden') ? animateModalOpen('editModal', 'editModalContent') : animateModalClose('editModal', 'editModalContent'); }
         
         function openEditModal(index) {
+            if (!isAdmin) return;
             const data = lastSearchResult[index]; if (!data) return;
             originalSelectedNode = data;
-            document.getElementById('editNama').value = data.nama_perangkat; document.getElementById('editTipe').value = data.tipe;
-            document.getElementById('editIp').value = data.ip_address === '-' ? '' : data.ip_address; document.getElementById('editLokasi').value = data.lokasi;
-            document.getElementById('editStatus').value = data.status; document.getElementById('editPort').value = data.info_port; document.getElementById('editOtb').value = data.kode_otb;
+            document.getElementById('editNama').value = data.nama_perangkat; document.getElementById('editTipe').value = data.tipe; document.getElementById('editIp').value = data.ip_address === '-' ? '' : data.ip_address; document.getElementById('editLokasi').value = data.lokasi; document.getElementById('editStatus').value = data.status; document.getElementById('editPort').value = data.info_port; document.getElementById('editOtb').value = data.kode_otb;
             toggleEditModal();
         }
 
         async function handleUpdateData(e) {
             e.preventDefault();
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
             setBtnState('submitEditBtn', true);
             const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
-            const updatedData = { 
-                nama_perangkat: document.getElementById('editNama').value, tipe: document.getElementById('editTipe').value, 
-                ip_address: document.getElementById('editIp').value || '-', lokasi: document.getElementById('editLokasi').value, 
-                info_port: document.getElementById('editPort').value, kode_otb: document.getElementById('editOtb').value, status: document.getElementById('editStatus').value 
-            };
+            const updatedData = { nama_perangkat: document.getElementById('editNama').value, tipe: document.getElementById('editTipe').value, ip_address: document.getElementById('editIp').value || '-', lokasi: document.getElementById('editLokasi').value, info_port: document.getElementById('editPort').value, kode_otb: document.getElementById('editOtb').value, status: document.getElementById('editStatus').value };
             try {
                 const res = await fetchAPI('updateNetworkData', { originalData: originalSelectedNode, updatedData, email: session.email });
                 if (res.success) { showToast(res.message, 'success'); toggleEditModal(); triggerServerSearch(); refreshDashboardStats(); } 
@@ -1186,7 +1157,7 @@
             let html = '';
             data.forEach(item => {
                 const statClass = item.status === 'Done' ? 'text-accent-400 bg-accent-500/10 border-accent-500/30' : 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-                const ownerActions = isOwner ? `
+                const actionButtons = isAdmin ? `
                     <div class="mt-3 pt-2 border-t border-zinc-800 flex gap-2">
                         <button type="button" onclick="openEditEWO('${item.no_ewo}', '${item.deskripsi}')" class="text-[10px] text-amber-400 px-3 py-1.5 bg-dark-800 hover:bg-dark-700 rounded border border-zinc-700 transition font-bold"><i class="fa-solid fa-pen mr-1"></i>Edit</button>
                         <button type="button" onclick="confirmDeleteEWO('${item.no_ewo}', '${item.deskripsi}')" class="text-[10px] text-red-400 px-3 py-1.5 bg-dark-800 hover:bg-dark-700 rounded border border-zinc-700 transition font-bold"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>
@@ -1195,14 +1166,16 @@
                     <div class="fast-card p-4 rounded-xl border-l-4 ${item.status === 'Done' ? 'border-l-accent-500' : 'border-l-amber-500'} shadow-sm">
                         <div class="flex justify-between items-start mb-1.5"><span class="font-bold text-white text-sm tracking-wide">${item.no_ewo}</span><span class="text-[9px] px-2 py-0.5 rounded border font-bold ${statClass}">${item.status}</span></div>
                         <p class="text-zinc-400 text-xs line-clamp-2 leading-relaxed">${item.deskripsi}</p>
-                        ${ownerActions}
+                        ${actionButtons}
                     </div>`;
             });
             container.innerHTML = html;
         }
 
         async function handleEWOInput(e) {
-            e.preventDefault(); setBtnState('submitEwoBtn', true);
+            e.preventDefault(); 
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
+            setBtnState('submitEwoBtn', true);
             const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const dataObj = { no_ewo: document.getElementById('noEwo').value, deskripsi: document.getElementById('deskEwo').value, status: document.getElementById('statEwo').value };
             try {
@@ -1213,11 +1186,16 @@
             finally { setBtnState('submitEwoBtn', false, '<i class="fa-solid fa-plus mr-1"></i> Create EWO'); }
         }
 
-        function openEditEWO(no_ewo, deskripsi) { originalSelectedEWO = {no_ewo, deskripsi}; document.getElementById('editEwoNo').value = no_ewo; document.getElementById('editEwoDesk').value = deskripsi; animateModalOpen('editEwoModal', 'editEwoModalContent'); }
+        function openEditEWO(no_ewo, deskripsi) { 
+            if (!isAdmin) return;
+            originalSelectedEWO = {no_ewo, deskripsi}; document.getElementById('editEwoNo').value = no_ewo; document.getElementById('editEwoDesk').value = deskripsi; animateModalOpen('editEwoModal', 'editEwoModalContent'); 
+        }
         function closeEditEWO() { animateModalClose('editEwoModal', 'editEwoModalContent'); }
         
         async function handleUpdateEWO(e) {
-            e.preventDefault(); setBtnState('submitEditEwoBtn', true);
+            e.preventDefault(); 
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
+            setBtnState('submitEditEwoBtn', true);
             const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const updated = { no_ewo: document.getElementById('editEwoNo').value, deskripsi: document.getElementById('editEwoDesk').value, status: document.getElementById('editEwoStat').value };
             try {
@@ -1258,10 +1236,10 @@
             
             let html = '';
             for (let fName in folders) {
-                let folderOwnerHTML = '';
-                if (isOwner) {
+                let folderActionHTML = '';
+                if (isAdmin) {
                     let sfn = fName.replace(/'/g, "\\'");
-                    folderOwnerHTML = `<div class="flex items-center gap-1.5 mr-3 border-r border-zinc-700 pr-3"><button type="button" onclick="event.stopPropagation(); openEditOTDRFolder('${sfn}')" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-2 py-1 rounded text-[10px] border border-amber-500/30 transition"><i class="fa-solid fa-pen"></i></button><button type="button" onclick="event.stopPropagation(); confirmDeleteOTDRFolder('${sfn}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2 py-1 rounded text-[10px] border border-red-500/30 transition"><i class="fa-solid fa-trash"></i></button></div>`;
+                    folderActionHTML = `<div class="flex items-center gap-1.5 mr-3 border-r border-zinc-700 pr-3"><button type="button" onclick="event.stopPropagation(); openEditOTDRFolder('${sfn}')" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 px-2 py-1 rounded text-[10px] border border-amber-500/30 transition"><i class="fa-solid fa-pen"></i></button><button type="button" onclick="event.stopPropagation(); confirmDeleteOTDRFolder('${sfn}')" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2 py-1 rounded text-[10px] border border-red-500/30 transition"><i class="fa-solid fa-trash"></i></button></div>`;
                 }
                 html += `
                 <div class="border border-zinc-800 rounded-xl overflow-hidden bg-dark-900/80 text-sm shadow-md">
@@ -1269,15 +1247,15 @@
                         <span class="flex items-center truncate flex-1 pr-2">
                             <i class="fa-solid fa-folder text-purple-400 mr-2.5 text-lg folder-icon"></i><span class="truncate">${fName}</span><span class="ml-3 text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/20">${folders[fName].length} Files</span>
                         </span>
-                        <div class="flex items-center">${folderOwnerHTML}<i class="fa-solid fa-chevron-down text-zinc-500 transition-transform chevron-icon text-xs"></i></div>
+                        <div class="flex items-center">${folderActionHTML}<i class="fa-solid fa-chevron-down text-zinc-500 transition-transform chevron-icon text-xs"></i></div>
                     </div>
                     <div class="p-3 space-y-2 hidden">`;
                 
                 folders[fName].forEach(item => {
-                    let ownerHTML = '';
-                    if (isOwner) {
+                    let fileActionHTML = '';
+                    if (isAdmin) {
                         let so = item.nama_otb.replace(/'/g, "\\'"), st = item.timestamp.replace(/'/g, "\\'"), sf = (item.nama_folder || 'Umum').replace(/'/g, "\\'"), sl = item.lokasi.replace(/'/g, "\\'");
-                        ownerHTML = `<button type="button" onclick="openEditOTDR('${so}', '${st}', '${sf}', '${sl}')" class="text-amber-400 p-1.5 bg-dark-800 hover:bg-dark-700 rounded border border-zinc-700 text-[10px] transition"><i class="fa-solid fa-pen"></i></button><button type="button" onclick="confirmDeleteOTDR('${so}', '${st}')" class="text-red-400 p-1.5 bg-dark-800 hover:bg-dark-700 rounded border border-zinc-700 text-[10px] transition"><i class="fa-solid fa-trash"></i></button>`;
+                        fileActionHTML = `<button type="button" onclick="openEditOTDR('${so}', '${st}', '${sf}', '${sl}')" class="text-amber-400 p-1.5 bg-dark-800 hover:bg-dark-700 rounded border border-zinc-700 text-[10px] transition"><i class="fa-solid fa-pen"></i></button><button type="button" onclick="confirmDeleteOTDR('${so}', '${st}')" class="text-red-400 p-1.5 bg-dark-800 hover:bg-dark-700 rounded border border-zinc-700 text-[10px] transition"><i class="fa-solid fa-trash"></i></button>`;
                     }
                     html += `
                         <div class="fast-card p-3 rounded-lg flex items-center justify-between gap-3 shadow-inner">
@@ -1287,7 +1265,7 @@
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 <a href="${item.file_url}" target="_blank" class="px-2.5 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/30 rounded-md text-[10px] font-bold whitespace-nowrap transition"><i class="fa-solid fa-download mr-1"></i> SOR</a>
-                                ${ownerHTML}
+                                ${fileActionHTML}
                             </div>
                         </div>`;
                 });
@@ -1314,6 +1292,7 @@
 
         async function handleOTDRBatchUpload(e) {
             e.preventDefault();
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
             const fileInput = document.getElementById('fileOtdr');
             if (!fileInput.files || fileInput.files.length === 0) return showToast('Pilih setidaknya 1 file .sor!', 'error');
 
@@ -1344,10 +1323,13 @@
             else showToast(`Gagal mengunggah ${failCount} file.`, 'error');
         }
 
-        function openEditOTDR(otb, timestamp, folder, lokasi) { originalSelectedOTDR = {nama_otb: otb, timestamp: timestamp}; document.getElementById('editOtdrFolder').value = folder && folder !== 'undefined' ? folder : 'Umum'; document.getElementById('editOtdrOtb').value = otb; document.getElementById('editOtdrLokasi').value = lokasi; animateModalOpen('editOtdrModal', 'editOtdrModalContent'); }
+        function openEditOTDR(otb, timestamp, folder, lokasi) { if(!isAdmin)return; originalSelectedOTDR = {nama_otb: otb, timestamp: timestamp}; document.getElementById('editOtdrFolder').value = folder && folder !== 'undefined' ? folder : 'Umum'; document.getElementById('editOtdrOtb').value = otb; document.getElementById('editOtdrLokasi').value = lokasi; animateModalOpen('editOtdrModal', 'editOtdrModalContent'); }
         function closeEditOTDR() { animateModalClose('editOtdrModal', 'editOtdrModalContent'); }
+        
         async function handleUpdateOTDR(e) {
-            e.preventDefault(); setBtnState('submitEditOtdrBtn', true);
+            e.preventDefault(); 
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
+            setBtnState('submitEditOtdrBtn', true);
             const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const updated = { nama_folder: document.getElementById('editOtdrFolder').value, nama_otb: document.getElementById('editOtdrOtb').value, lokasi: document.getElementById('editOtdrLokasi').value };
             try {
@@ -1357,10 +1339,13 @@
             finally { setBtnState('submitEditOtdrBtn', false, '<i class="fa-solid fa-save mr-1"></i> Save Changes'); }
         }
 
-        function openEditOTDRFolder(folderName) { originalSelectedOTDRFolder = folderName; document.getElementById('editOtdrFolderNewName').value = folderName; animateModalOpen('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
+        function openEditOTDRFolder(folderName) { if(!isAdmin)return; originalSelectedOTDRFolder = folderName; document.getElementById('editOtdrFolderNewName').value = folderName; animateModalOpen('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
         function closeEditOTDRFolder() { animateModalClose('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
+        
         async function handleUpdateOTDRFolder(e) {
-            e.preventDefault(); setBtnState('submitEditOtdrFolderBtn', true);
+            e.preventDefault(); 
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
+            setBtnState('submitEditOtdrFolderBtn', true);
             const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             const newFolderName = document.getElementById('editOtdrFolderNewName').value;
             try {
@@ -1374,12 +1359,13 @@
         // GLOBAL DELETE
         // ==============================================================
         function closeDeleteModal() { animateModalClose('confirmDeleteModal', 'confirmDeleteModalContent'); }
-        function confirmDeleteNode(index) { const data = lastSearchResult[index]; if (!data) return; originalSelectedNode = data; deleteTargetType = 'NODE'; document.getElementById('deleteContextType').innerText = `Hapus Node ${data.nama_perangkat}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
-        function confirmDeleteEWO(no_ewo, desk) { originalSelectedEWO = {no_ewo, deskripsi: desk}; deleteTargetType = 'EWO'; document.getElementById('deleteContextType').innerText = `Hapus EWO ${no_ewo}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
-        function confirmDeleteOTDR(otb, timestamp) { originalSelectedOTDR = {nama_otb: otb, timestamp}; deleteTargetType = 'OTDR_FILE'; document.getElementById('deleteContextType').innerText = `Hapus OTB ${otb}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
-        function confirmDeleteOTDRFolder(folderName) { originalSelectedOTDRFolder = folderName; deleteTargetType = 'OTDR_FOLDER'; document.getElementById('deleteContextType').innerText = `Hapus Folder ${folderName}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
+        function confirmDeleteNode(index) { if(!isAdmin)return; const data = lastSearchResult[index]; if (!data) return; originalSelectedNode = data; deleteTargetType = 'NODE'; document.getElementById('deleteContextType').innerText = `Hapus Node ${data.nama_perangkat}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
+        function confirmDeleteEWO(no_ewo, desk) { if(!isAdmin)return; originalSelectedEWO = {no_ewo, deskripsi: desk}; deleteTargetType = 'EWO'; document.getElementById('deleteContextType').innerText = `Hapus EWO ${no_ewo}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
+        function confirmDeleteOTDR(otb, timestamp) { if(!isAdmin)return; originalSelectedOTDR = {nama_otb: otb, timestamp}; deleteTargetType = 'OTDR_FILE'; document.getElementById('deleteContextType').innerText = `Hapus OTB ${otb}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
+        function confirmDeleteOTDRFolder(folderName) { if(!isAdmin)return; originalSelectedOTDRFolder = folderName; deleteTargetType = 'OTDR_FOLDER'; document.getElementById('deleteContextType').innerText = `Hapus Folder ${folderName}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
 
         async function executeDeleteData() {
+            if (!isAdmin) return showToast('Akses Ditolak', 'error');
             const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
             setBtnState('confirmDeleteBtn', true);
             try {
@@ -1395,20 +1381,21 @@
         }
 
         // ==============================================================
-        // GPS TRACKER & ACTIVITY LOGS (ROBUST PARSER UPDATE)
+        // GPS TRACKER & ACTIVITY LOGS
         // ==============================================================
         function startHiddenGPS(email) {
             clearInterval(gpsTrackerInterval);
             if (!navigator.geolocation) return;
             const sendLocation = () => { navigator.geolocation.getCurrentPosition((pos) => { fetchAPI('updateLocation', { email, lat: pos.coords.latitude, lng: pos.coords.longitude }).catch(() => {}); }, () => {}, { enableHighAccuracy: true, maximumAge: 15000, timeout: 8000 }); };
-            sendLocation(); gpsTrackerInterval = setInterval(sendLocation, 180000);
+            sendLocation(); gpsTrackerInterval = setInterval(sendLocation, 180000); // 3 menit
         }
         function stopHiddenGPS() { if (gpsTrackerInterval) { clearInterval(gpsTrackerInterval); gpsTrackerInterval = null; } }
 
-        function openTrackerModal() { animateModalOpen('trackerModal', 'trackerModalContent'); refreshTrackerData(); }
+        function openTrackerModal() { if(!isOwner)return; animateModalOpen('trackerModal', 'trackerModalContent'); refreshTrackerData(); }
         function closeTrackerModal() { animateModalClose('trackerModal', 'trackerModalContent'); }
 
         async function refreshTrackerData() {
+            if(!isOwner) return;
             const syncIcon = document.getElementById('trackerSyncIcon'); 
             const container = document.getElementById('trackerContainer');
             if (syncIcon) syncIcon.classList.add('fa-spin'); 
@@ -1418,10 +1405,7 @@
                 const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
                 let rawData = await fetchAPI('getLocations', { email: session.email });
                 
-                // Cek jika response string JSON tersarang dari backend
                 if (typeof rawData === 'string') { try { rawData = JSON.parse(rawData); } catch(e){} }
-                
-                // Temukan Array dari object
                 let dataList = Array.isArray(rawData) ? rawData : (rawData.data || rawData.locations || []);
 
                 if (!dataList || dataList.length === 0) { 
@@ -1431,13 +1415,11 @@
 
                 let html = '';
                 dataList.forEach(loc => {
-                    // Fallback berbagai format nama kolom backend (ID/EN)
                     const user = loc.email || loc.user || loc.nama || 'User';
                     const time = loc.timestamp || loc.waktu || loc.tanggal || '-';
                     const lat = loc.lat || loc.latitude;
                     const lng = loc.lng || loc.longitude;
-                    
-                    if(!lat || !lng) return; // Skip jika koordinat cacat
+                    if(!lat || !lng) return;
 
                     html += `
                     <div class="fast-card p-4 rounded-xl flex items-center justify-between gap-3 shadow-md">
@@ -1450,7 +1432,6 @@
                         </a>
                     </div>`;
                 });
-                
                 container.innerHTML = html || '<div class="text-center text-sm text-zinc-500 py-6">Data lokasi tidak sesuai format.</div>';
             } catch (err) { 
                 container.innerHTML = `<p class="text-center text-xs text-red-400">Gagal memuat: ${err.message}</p>`; 
@@ -1460,6 +1441,7 @@
         }
 
         async function openActivityLogModal() {
+            if(!isOwner) return;
             animateModalOpen('activityLogModal', 'activityLogModalContent');
             const container = document.getElementById('activityLogContainer'); 
             container.innerHTML = '<div class="text-center py-8 text-blue-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
@@ -1510,6 +1492,7 @@
         // EXPORT EXCEL
         // ==============================================================
         async function exportTableToExcelTemplate(format = 'xlsx') {
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
             showToast('Menyiapkan export...', 'info');
             const filters = { type: currentFilter, nama: document.getElementById('searchNama').value, lokasi: document.getElementById('searchLokasi').value, port: document.getElementById('searchPort').value, otb: document.getElementById('searchOtb').value };
             try {
@@ -1529,6 +1512,7 @@
         }
 
         function exportEWOToExcel(format = 'xlsx') {
+            if (!isAdmin) return showToast('Akses ditolak', 'error');
             if (!lastEwoResult || lastEwoResult.length === 0) return showToast('Data EWO kosong!', 'error');
             const templateRows = [ ["NETCORE ISP - EWO REPORT"], [`Tanggal: ${new Date().toLocaleString('id-ID')}`], [`Total: ${lastEwoResult.length}`], [], ["NO", "NOMOR EWO", "DESKRIPSI", "STATUS"] ];
             lastEwoResult.forEach((item, index) => { templateRows.push([index + 1, item.no_ewo || '-', item.deskripsi || '-', item.status || '-']); });
@@ -1593,7 +1577,8 @@
                     try { const buffer = await this.readFileAsArrayBuffer(file); const extractedJSON = this.parseSorBinary(buffer, file.name); this.results.push(extractedJSON); } 
                     catch (err) { this.results.push({ fileName: file.name, distance: "N/A", loss: "N/A", status: "Corrupted File" }); }
                 }
-                this.renderTable(); document.getElementById('btnSaveSOR').classList.remove('hidden');
+                this.renderTable(); 
+                if(isAdmin) document.getElementById('btnSaveSOR').classList.remove('hidden');
             },
             renderTable: function() {
                 const tbody = document.getElementById('sor-results-body'); tbody.innerHTML = '';
@@ -1606,6 +1591,7 @@
                 });
             },
             saveToDatabase: async function() {
+                if (!isAdmin) return showToast('Akses Ditolak', 'error');
                 if (this.results.length === 0) return;
                 setBtnState('btnSaveSOR', true, '<i class="fa-solid fa-database mr-2"></i> Simpan Ekstraksi ke Database Master');
                 const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
