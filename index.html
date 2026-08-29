@@ -6,6 +6,11 @@
     <meta name="theme-color" content="#09090b">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- KEAMANAN LAPIS 1: Content Security Policy (CSP) -->
+    <!-- Membatasi dari mana script, style, dan koneksi API boleh dimuat -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://script.google.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:;">
+
     <title>Netcore | ISP Professional Dashboard</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -123,7 +128,6 @@
         <aside class="w-64 fast-glass hidden md:flex flex-col flex-shrink-0 z-50 border-r border-white/10 h-full">
             <div class="p-6 flex items-center gap-3 border-b border-white/10 shrink-0">
                 <div class="w-10 h-10 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-neon-blue">
-                    <!-- ICON ROKET MENGGANTIKAN GLOBE -->
                     <i class="fa-solid fa-rocket text-white"></i>
                 </div>
                 <div>
@@ -186,7 +190,6 @@
                 <div class="flex justify-between items-center px-4 py-3.5">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 bg-gradient-to-tr from-brand-500 to-indigo-600 rounded-full flex items-center justify-center shadow-neon-blue">
-                            <!-- ICON ROKET MENGGANTIKAN GLOBE -->
                             <i class="fa-solid fa-rocket text-white text-xs"></i>
                         </div>
                         <div>
@@ -311,7 +314,6 @@
                     <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex-1 flex flex-col items-center justify-center py-2 text-brand-400 active:scale-90 transition">
                         <i class="fa-solid fa-house mb-0.5 text-base"></i><span class="text-[9px] font-semibold">Home</span>
                     </button>
-                    <!-- Tombol Add Node (Mobile) yang akan dinamis disembunyikan untuk User -->
                     <button id="menuAddNodeMob" onclick="toggleInputModal()" class="flex-1 hidden flex-col items-center justify-center py-2 text-zinc-400 active:scale-90 transition">
                         <i class="fa-solid fa-square-plus mb-0.5 text-base"></i><span class="text-[9px] font-medium">Add Node</span>
                     </button>
@@ -345,35 +347,22 @@
         </div>
     </div>
 
-    <!-- Modal Database Table -->
+    <!-- SEMUA STRUKTUR MODAL LAINNYA TETAP SAMA (Database, Form, EWO, OTDR, Dll) -->
     <div id="databaseModal" class="hidden fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/75 transition-opacity duration-200 opacity-0 backdrop-blur-sm">
         <div id="databaseModalContent" class="bg-dark-900 w-full md:w-[95%] md:max-w-[1300px] md:rounded-3xl rounded-t-[28px] border-t md:border border-zinc-800 flex flex-col h-[90vh] transition-transform duration-200 transform translate-y-full shadow-2xl mx-auto">
             <div class="w-full flex justify-center pt-2.5 pb-1.5 md:hidden"><div class="w-10 h-1 bg-zinc-700 rounded-full"></div></div>
-            
             <div class="px-4 py-4 border-b border-zinc-800/80 flex justify-between items-center bg-dark-900 md:rounded-t-3xl sticky top-0 z-20">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-brand-500/20 flex items-center justify-center border border-brand-500/30">
-                        <i class="fa-solid fa-database text-brand-400 text-sm"></i>
-                    </div>
+                    <div class="w-8 h-8 rounded-xl bg-brand-500/20 flex items-center justify-center border border-brand-500/30"><i class="fa-solid fa-database text-brand-400 text-sm"></i></div>
                     <h3 id="databaseModalTitle" class="text-white text-base font-bold">Database Node Explorer</h3>
                 </div>
-                
                 <div class="flex items-center gap-3">
-                    <div id="serverLoadingIndicator" class="hidden text-[10px] text-brand-400 font-bold animate-pulse flex items-center gap-1 bg-brand-500/10 px-3 py-1 rounded-full">
-                        <i class="fa-solid fa-circle-notch fa-spin"></i> Syncing...
-                    </div>
-                    <button id="btnExportDbXlsx" onclick="exportTableToExcelTemplate('xlsx')" class="hidden text-[10px] bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition">
-                        <i class="fa-solid fa-file-excel mr-1"></i> Excel
-                    </button>
-                    <button id="btnExportDbCsv" onclick="exportTableToExcelTemplate('csv')" class="hidden text-[10px] bg-dark-800 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded-lg font-bold hover:bg-dark-700 transition">
-                        CSV
-                    </button>
-                    <button onclick="closeDatabaseModal()" class="w-8 h-8 bg-dark-800 hover:bg-dark-700 rounded-full flex justify-center items-center text-zinc-400 transition">
-                        <i class="fa-solid fa-xmark text-sm"></i>
-                    </button>
+                    <div id="serverLoadingIndicator" class="hidden text-[10px] text-brand-400 font-bold animate-pulse flex items-center gap-1 bg-brand-500/10 px-3 py-1 rounded-full"><i class="fa-solid fa-circle-notch fa-spin"></i> Syncing...</div>
+                    <button id="btnExportDbXlsx" onclick="exportTableToExcelTemplate('xlsx')" class="hidden text-[10px] bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-600/30 transition"><i class="fa-solid fa-file-excel mr-1"></i> Excel</button>
+                    <button id="btnExportDbCsv" onclick="exportTableToExcelTemplate('csv')" class="hidden text-[10px] bg-dark-800 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded-lg font-bold hover:bg-dark-700 transition">CSV</button>
+                    <button onclick="closeDatabaseModal()" class="w-8 h-8 bg-dark-800 hover:bg-dark-700 rounded-full flex justify-center items-center text-zinc-400 transition"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
             </div>
-            
             <div class="p-4 md:p-6 overflow-hidden flex-1 flex flex-col gap-4">
                 <div class="flex flex-nowrap overflow-x-auto scrollbar-hide gap-2 pb-1 shrink-0">
                     <button id="modal-btn-All" onclick="setModalFilter('All')" class="modal-filter-btn active">All Nodes</button>
@@ -381,14 +370,12 @@
                     <button id="modal-btn-Switch" onclick="setModalFilter('Switch')" class="modal-filter-btn inactive">Switch</button>
                     <button id="modal-btn-Backbone" onclick="setModalFilter('Backbone')" class="modal-filter-btn inactive">Backbone</button>
                 </div>
-                
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
                     <div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input type="text" id="searchNama" oninput="triggerServerSearch()" placeholder="Search Device..." class="w-full fast-input rounded-xl pl-9 p-2.5 text-xs text-white placeholder-zinc-600 focus:ring-1 focus:ring-brand-500"></div>
                     <div class="relative"><i class="fa-solid fa-location-dot absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input type="text" id="searchLokasi" oninput="triggerServerSearch()" placeholder="Location..." class="w-full fast-input rounded-xl pl-9 p-2.5 text-xs text-white placeholder-zinc-600 focus:ring-1 focus:ring-brand-500"></div>
                     <div class="relative"><i class="fa-solid fa-ethernet absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input type="text" id="searchPort" oninput="triggerServerSearch()" placeholder="Port..." class="w-full fast-input rounded-xl pl-9 p-2.5 text-xs text-white placeholder-zinc-600 focus:ring-1 focus:ring-brand-500"></div>
                     <div class="relative"><i class="fa-solid fa-barcode absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i><input type="text" id="searchOtb" oninput="triggerServerSearch()" placeholder="OTB..." class="w-full fast-input rounded-xl pl-9 p-2.5 text-xs text-white placeholder-zinc-600 focus:ring-1 focus:ring-brand-500"></div>
                 </div>
-                
                 <div class="rounded-2xl relative flex-1 bg-dark-950/80 border border-zinc-800/80 p-3 overflow-hidden shadow-inner">
                     <div id="data-list-container" class="w-full h-full overflow-y-auto space-y-3 scrollbar-hide smooth-scroll md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4 md:space-y-0 content-start pb-6 pr-1"></div>
                     <div id="emptyState" class="hidden absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-zinc-500">
@@ -636,18 +623,40 @@
         </div>
     </div>
 
+    <!-- ==============================================================
+         BLOK JAVASCRIPT UTAMA 
+         (Sangat disarankan: Kopi isi script ini ke obfuscator.io sebelum di-upload)
+         ============================================================== -->
     <script>
+        // KEAMANAN LAPIS 2: Anti-Inspect Element & Klik Kanan
+        // Mencegah Klik Kanan
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Mencegah F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+        document.onkeydown = function(e) {
+            if (e.keyCode === 123 || 
+               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+               (e.ctrlKey && e.keyCode === 85)) {
+                return false;
+            }
+        };
+
         // ==============================================================
         // FETCH API BRIDGE
         // ==============================================================
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbydbmac2A0zMqLpbqYEgjsGnhYrGqa0L-UlfKkx-1KTt5NL7pwGmQ2mRsD85IEqIQ3H/exec"; 
+        
+        // KEAMANAN LAPIS 3: Token Rahasia untuk Backend
+        // *Pastikan Anda menambahkan kode di Google Apps Script untuk mengecek token ini
+        const SECRET_TOKEN = "NETCORE_SECURE_2026"; 
 
         const fetchAPI = async (action, payload = {}) => {
             if (!GAS_API_URL) throw new Error("API URL tidak terdefinisi.");
             const response = await fetch(GAS_API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action, payload }),
+                // Token disisipkan di dalam body request agar dicek oleh Backend
+                body: JSON.stringify({ action, payload, token: SECRET_TOKEN }), 
                 redirect: "follow"
             });
             const result = await response.json();
@@ -674,11 +683,6 @@
         let gpsTrackerInterval = null;
         let sessionTimerInterval = null;
 
-        // DIHAPUS: Agar sesi persisten dan tidak hilang saat tab ditutup/direload
-        // window.addEventListener('beforeunload', () => {
-        //     sessionStorage.removeItem('netcore_session');
-        // });
-
         // ==============================================================
         // APEX CHARTS INITIALIZATION
         // ==============================================================
@@ -690,7 +694,7 @@
                 series: [stats.olt || 0, stats.switch || 0, stats.backbone || 0],
                 chart: { type: 'polarArea', height: 320, background: 'transparent' },
                 labels: ['Terminal OLT', 'Core Switches', 'Jalur Backbone'],
-                colors: ['#a855f7', '#3b82f6', '#f97316'], // Purple, Blue, Orange
+                colors: ['#a855f7', '#3b82f6', '#f97316'],
                 fill: { opacity: 0.8 },
                 stroke: { colors: ['#09090b'], width: 2 },
                 yaxis: { show: false },
@@ -877,29 +881,16 @@
         // Modal Toggles
         function openMapModal() { animateModalOpen('mapModal', 'mapModalContent'); }
         function closeMapModal() { animateModalClose('mapModal', 'mapModalContent'); }
-        
         function openDatabaseModal(type) { setModalFilter(type); animateModalOpen('databaseModal', 'databaseModalContent'); }
         function closeDatabaseModal() { animateModalClose('databaseModal', 'databaseModalContent'); }
-        
         function toggleInputModal() { const m = document.getElementById('inputModal'); m.classList.contains('hidden') ? animateModalOpen('inputModal', 'inputModalContent') : animateModalClose('inputModal', 'inputModalContent'); }
-        
-        function toggleEWOModal() { 
-            const m = document.getElementById('ewoModal'); 
-            if (m.classList.contains('hidden')) { animateModalOpen('ewoModal', 'ewoModalContent'); refreshEWOList(); } 
-            else animateModalClose('ewoModal', 'ewoModalContent'); 
-        }
-        
-        function toggleOTDRModal() { 
-            const m = document.getElementById('otdrModal'); 
-            if (m.classList.contains('hidden')) { animateModalOpen('otdrModal', 'otdrModalContent'); refreshOTDRList(1); } 
-            else animateModalClose('otdrModal', 'otdrModalContent'); 
-        }
-        
+        function toggleEWOModal() { const m = document.getElementById('ewoModal'); if (m.classList.contains('hidden')) { animateModalOpen('ewoModal', 'ewoModalContent'); refreshEWOList(); } else animateModalClose('ewoModal', 'ewoModalContent'); }
+        function toggleOTDRModal() { const m = document.getElementById('otdrModal'); if (m.classList.contains('hidden')) { animateModalOpen('otdrModal', 'otdrModalContent'); refreshOTDRList(1); } else animateModalClose('otdrModal', 'otdrModalContent'); }
         function openSorBatchModal() { animateModalOpen('sorBatchModal', 'sorBatchModalContent'); }
         function closeSorBatchModal() { animateModalClose('sorBatchModal', 'sorBatchModalContent'); }
 
         // ==============================================================
-        // AUTHENTICATION, ROLES & SESSION MANAGEMENT (UPDATED TO 8 HOURS)
+        // AUTHENTICATION, ROLES & SESSION MANAGEMENT (8 HOURS)
         // ==============================================================
         async function handleLogin(e) {
             e.preventDefault();
@@ -914,7 +905,6 @@
                 
                 if (res.success) {
                     const now = Date.now();
-                    // Gunakan localStorage agar sesi tidak hilang ketika tab ditutup
                     localStorage.setItem('netcore_session', JSON.stringify({ email: res.email, role: res.role, loginTime: now }));
                     localStorage.setItem('netcore_device_history', JSON.stringify({ email: email, password: btoa(encodeURIComponent(password)), loginTime: now }));
                     checkSession();
@@ -929,13 +919,12 @@
         }
 
         function handleLogout(isExpired = false) {
-            localStorage.removeItem('netcore_session'); // Hapus sesi dari localStorage
+            localStorage.removeItem('netcore_session');
             clearInterval(sessionTimerInterval);
             stopHiddenGPS();
             
             document.getElementById('loginForm').reset();
             checkSession();
-
             if (isExpired === true) showToast('Sesi telah direset/berakhir.', 'info');
         }
 
@@ -976,19 +965,15 @@
             const sessionData = localStorage.getItem('netcore_session');
             if (sessionData) {
                 const parsed = JSON.parse(sessionData);
-                
-                // 28.800.000 ms = 8 Jam batas kedaluwarsa sesi
                 if (now - parsed.loginTime > 28800000) { handleLogout(true); return; }
 
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('dashboardWrapper').classList.remove('hidden');
                 
-                // MENGATUR RULES SESUAI ROLE (RBAC)
                 userRole = (parsed.role || 'USER').toUpperCase();
                 isOwner = userRole === 'OWNER';
                 isAdmin = userRole === 'ADMIN' || isOwner;
 
-                // Konfigurasi Badge Teks
                 const badgeMob = document.getElementById('userRoleBadgeMob');
                 const badgeDesk = document.getElementById('userRoleBadgeDesk');
                 
@@ -999,30 +984,15 @@
                 badgeMob.className = `ml-2 px-1.5 py-0.5 text-[8px] font-black text-black rounded tracking-wider uppercase ${badgeColor}`;
                 badgeDesk.className = `ml-2 px-2 py-0.5 text-[9px] font-black text-black rounded tracking-wider uppercase ${badgeColor}`;
 
-                // Fungsi bantuan untuk show/hide berdasarkan role
-                const toggleVisibility = (id, show) => { 
-                    const el = document.getElementById(id); 
-                    if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); 
-                };
+                const toggleVisibility = (id, show) => { const el = document.getElementById(id); if(el) show ? el.classList.remove('hidden') : el.classList.add('hidden'); };
                 
-                // 1. Toggles Untuk ADMIN (bisa input form & export)
-                toggleVisibility('menuAddNodeDesk', isAdmin);
-                toggleVisibility('menuAddNodeMob', isAdmin);
-                toggleVisibility('ewoInputForm', isAdmin);
-                toggleVisibility('otdrInputForm', isAdmin);
-                toggleVisibility('btnExportDbXlsx', isAdmin);
-                toggleVisibility('btnExportDbCsv', isAdmin);
-                toggleVisibility('btnExportEwoXlsx', isAdmin);
-
-                // 2. Toggles Khusus OWNER (GPS & Activity Log)
-                toggleVisibility('desktopOwnerMenus', isOwner);
-                toggleVisibility('btnMobTracker', isOwner);
-                toggleVisibility('btnMobActivity', isOwner);
+                toggleVisibility('menuAddNodeDesk', isAdmin); toggleVisibility('menuAddNodeMob', isAdmin); toggleVisibility('ewoInputForm', isAdmin); toggleVisibility('otdrInputForm', isAdmin); toggleVisibility('btnExportDbXlsx', isAdmin); toggleVisibility('btnExportDbCsv', isAdmin); toggleVisibility('btnExportEwoXlsx', isAdmin);
+                toggleVisibility('desktopOwnerMenus', isOwner); toggleVisibility('btnMobTracker', isOwner); toggleVisibility('btnMobActivity', isOwner);
 
                 document.getElementById('currentDateDesktop').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                 
                 startSessionTimer();
-                startHiddenGPS(parsed.email); // User & Admin akan tetap mengirim data lokasi di latar belakang jika browser izin
+                startHiddenGPS(parsed.email);
                 refreshDashboardStats();
             } else {
                 document.getElementById('loginPage').classList.remove('hidden');
@@ -1037,26 +1007,8 @@
         // ==============================================================
         // NODE EXPLORER & CRUD
         // ==============================================================
-        function setModalFilter(type) {
-            currentFilter = type;
-            document.querySelectorAll('.modal-filter-btn').forEach(btn => { btn.className = 'modal-filter-btn inactive shrink-0'; });
-            const activeBtn = document.getElementById('modal-btn-' + type);
-            if (activeBtn) activeBtn.className = 'modal-filter-btn active shrink-0';
-            triggerServerSearch();
-        }
-
-        function triggerServerSearch() {
-            clearTimeout(searchTimeout);
-            document.getElementById('serverLoadingIndicator').classList.remove('hidden');
-            searchTimeout = setTimeout(async () => {
-                const filters = { type: currentFilter, nama: document.getElementById('searchNama').value, lokasi: document.getElementById('searchLokasi').value, port: document.getElementById('searchPort').value, otb: document.getElementById('searchOtb').value };
-                try {
-                    const data = await fetchAPI('searchNetworkData', { filters });
-                    renderDatabaseList(data);
-                } catch (err) { showToast(err.message, 'error'); } 
-                finally { document.getElementById('serverLoadingIndicator').classList.add('hidden'); }
-            }, 300);
-        }
+        function setModalFilter(type) { currentFilter = type; document.querySelectorAll('.modal-filter-btn').forEach(btn => { btn.className = 'modal-filter-btn inactive shrink-0'; }); const activeBtn = document.getElementById('modal-btn-' + type); if (activeBtn) activeBtn.className = 'modal-filter-btn active shrink-0'; triggerServerSearch(); }
+        function triggerServerSearch() { clearTimeout(searchTimeout); document.getElementById('serverLoadingIndicator').classList.remove('hidden'); searchTimeout = setTimeout(async () => { const filters = { type: currentFilter, nama: document.getElementById('searchNama').value, lokasi: document.getElementById('searchLokasi').value, port: document.getElementById('searchPort').value, otb: document.getElementById('searchOtb').value }; try { const data = await fetchAPI('searchNetworkData', { filters }); renderDatabaseList(data); } catch (err) { showToast(err.message, 'error'); } finally { document.getElementById('serverLoadingIndicator').classList.add('hidden'); } }, 300); }
 
         function renderDatabaseList(data) {
             lastSearchResult = data || [];
@@ -1070,35 +1022,20 @@
                 let bc = 'border-l-purple-500', ic = 'fa-server text-purple-400', bgc = 'bg-purple-500/10 border-purple-500/30 text-purple-400';
                 if (x.tipe === 'Switch') { bc = 'border-l-blue-500'; ic = 'fa-random text-blue-400'; bgc = 'bg-blue-500/10 border-blue-500/30 text-blue-400'; }
                 else if (x.tipe === 'Backbone') { bc = 'border-l-orange-500'; ic = 'fa-route text-orange-400'; bgc = 'bg-orange-500/10 border-orange-500/30 text-orange-400'; }
-                
                 let sc = 'text-accent-400 bg-accent-500/10 border-accent-500/30', dot = 'bg-accent-500';
                 if (x.status === 'Offline') { sc = 'text-red-400 bg-red-500/10 border-red-500/30'; dot = 'bg-red-500'; }
                 else if (x.status === 'Warning') { sc = 'text-amber-400 bg-amber-500/10 border-amber-500/30'; dot = 'bg-amber-500'; }
-
                 const actionButtons = isAdmin ? `
                     <div class="flex gap-2 mt-2 pt-2 border-t border-zinc-800">
                         <button onclick="openEditModal(${i})" class="flex-1 bg-dark-800 hover:bg-dark-700 text-amber-400 border border-zinc-700 text-[10px] font-bold py-1.5 rounded-lg transition"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
                         <button onclick="confirmDeleteNode(${i})" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] font-bold py-1.5 rounded-lg transition"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
                     </div>` : '';
-
                 h += `
                 <div class="fast-card p-4 rounded-xl border-l-4 ${bc} flex flex-col gap-2 shadow-sm hover:border-zinc-600 transition duration-300">
-                    <div class="flex justify-between items-start gap-2">
-                        <h4 class="font-bold text-white text-sm truncate" title="${x.nama_perangkat}">${x.nama_perangkat}</h4>
-                        <span class="px-2 py-0.5 rounded text-[9px] font-bold border flex items-center gap-1 shrink-0 ${bgc}"><i class="fa-solid ${ic.split(' ')[0]}"></i> ${x.tipe}</span>
-                    </div>
-                    <div class="flex justify-between items-center text-[10px]">
-                        <span class="text-brand-400 font-mono bg-brand-500/10 px-1.5 py-0.5 rounded border border-brand-500/20"><i class="fa-solid fa-network-wired mr-1"></i>${x.ip_address || '-'}</span>
-                        <span class="px-2 py-0.5 rounded-full border font-bold flex items-center gap-1 ${sc}"><span class="w-1.5 h-1.5 rounded-full ${dot}"></span> ${x.status}</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-[10px] text-zinc-400 mt-1">
-                        <div class="bg-dark-900 p-1.5 rounded-md border border-zinc-800/80 truncate"><i class="fa-solid fa-map-pin text-accent-500 mr-1.5"></i><span class="text-zinc-200 font-medium">${x.lokasi || '-'}</span></div>
-                        <div class="bg-dark-900 p-1.5 rounded-md border border-zinc-800/80 truncate"><i class="fa-solid fa-ethernet text-purple-400 mr-1.5"></i><span class="text-zinc-200 font-medium">${x.info_port || '-'}</span></div>
-                    </div>
-                    <div class="bg-dark-900 border border-zinc-800 p-2 rounded-lg flex justify-between items-center text-[10px] mt-1 shadow-inner">
-                        <span class="text-zinc-400 font-bold"><i class="fa-solid fa-barcode text-orange-400 mr-1.5"></i>KODE OTB</span>
-                        <span class="font-mono text-white font-bold bg-dark-800 px-1.5 py-0.5 rounded">${x.kode_otb || '-'}</span>
-                    </div>
+                    <div class="flex justify-between items-start gap-2"><h4 class="font-bold text-white text-sm truncate" title="${x.nama_perangkat}">${x.nama_perangkat}</h4><span class="px-2 py-0.5 rounded text-[9px] font-bold border flex items-center gap-1 shrink-0 ${bgc}"><i class="fa-solid ${ic.split(' ')[0]}"></i> ${x.tipe}</span></div>
+                    <div class="flex justify-between items-center text-[10px]"><span class="text-brand-400 font-mono bg-brand-500/10 px-1.5 py-0.5 rounded border border-brand-500/20"><i class="fa-solid fa-network-wired mr-1"></i>${x.ip_address || '-'}</span><span class="px-2 py-0.5 rounded-full border font-bold flex items-center gap-1 ${sc}"><span class="w-1.5 h-1.5 rounded-full ${dot}"></span> ${x.status}</span></div>
+                    <div class="grid grid-cols-2 gap-2 text-[10px] text-zinc-400 mt-1"><div class="bg-dark-900 p-1.5 rounded-md border border-zinc-800/80 truncate"><i class="fa-solid fa-map-pin text-accent-500 mr-1.5"></i><span class="text-zinc-200 font-medium">${x.lokasi || '-'}</span></div><div class="bg-dark-900 p-1.5 rounded-md border border-zinc-800/80 truncate"><i class="fa-solid fa-ethernet text-purple-400 mr-1.5"></i><span class="text-zinc-200 font-medium">${x.info_port || '-'}</span></div></div>
+                    <div class="bg-dark-900 border border-zinc-800 p-2 rounded-lg flex justify-between items-center text-[10px] mt-1 shadow-inner"><span class="text-zinc-400 font-bold"><i class="fa-solid fa-barcode text-orange-400 mr-1.5"></i>KODE OTB</span><span class="font-mono text-white font-bold bg-dark-800 px-1.5 py-0.5 rounded">${x.kode_otb || '-'}</span></div>
                     ${actionButtons}
                 </div>`;
             }
@@ -1108,27 +1045,15 @@
         async function handleInputData(e) {
             e.preventDefault();
             if (!isAdmin) return showToast('Akses ditolak: Memerlukan izin Admin', 'error');
-            
             setBtnState('submitInputBtn', true);
             const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const dataObj = { nama_perangkat: document.getElementById('inputNama').value, tipe: document.getElementById('inputTipe').value, ip_address: document.getElementById('inputIp').value || '-', lokasi: document.getElementById('inputLokasi').value, info_port: document.getElementById('inputPort').value || '-', kode_otb: document.getElementById('inputOtb').value || '-', status: document.getElementById('inputStatus').value };
-            try {
-                const res = await fetchAPI('insertNetworkData', { dataObj, email: session.email });
-                if (res.success) { showToast(res.message, 'success'); document.getElementById('manualInputForm').reset(); toggleInputModal(); refreshDashboardStats(); triggerServerSearch(); } 
-                else showToast(res.message, 'error');
-            } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('submitInputBtn', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Save Node Configuration'); }
+            try { const res = await fetchAPI('insertNetworkData', { dataObj, email: session.email }); if (res.success) { showToast(res.message, 'success'); document.getElementById('manualInputForm').reset(); toggleInputModal(); refreshDashboardStats(); triggerServerSearch(); } else showToast(res.message, 'error'); } 
+            catch (err) { showToast(err.message, 'error'); } finally { setBtnState('submitInputBtn', false, '<i class="fa-solid fa-cloud-arrow-up"></i> Save Node Configuration'); }
         }
 
         function toggleEditModal() { const m = document.getElementById('editModal'); m.classList.contains('hidden') ? animateModalOpen('editModal', 'editModalContent') : animateModalClose('editModal', 'editModalContent'); }
-        
-        function openEditModal(index) {
-            if (!isAdmin) return;
-            const data = lastSearchResult[index]; if (!data) return;
-            originalSelectedNode = data;
-            document.getElementById('editNama').value = data.nama_perangkat; document.getElementById('editTipe').value = data.tipe; document.getElementById('editIp').value = data.ip_address === '-' ? '' : data.ip_address; document.getElementById('editLokasi').value = data.lokasi; document.getElementById('editStatus').value = data.status; document.getElementById('editPort').value = data.info_port; document.getElementById('editOtb').value = data.kode_otb;
-            toggleEditModal();
-        }
+        function openEditModal(index) { if (!isAdmin) return; const data = lastSearchResult[index]; if (!data) return; originalSelectedNode = data; document.getElementById('editNama').value = data.nama_perangkat; document.getElementById('editTipe').value = data.tipe; document.getElementById('editIp').value = data.ip_address === '-' ? '' : data.ip_address; document.getElementById('editLokasi').value = data.lokasi; document.getElementById('editStatus').value = data.status; document.getElementById('editPort').value = data.info_port; document.getElementById('editOtb').value = data.kode_otb; toggleEditModal(); }
 
         async function handleUpdateData(e) {
             e.preventDefault();
@@ -1136,27 +1061,20 @@
             setBtnState('submitEditBtn', true);
             const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const updatedData = { nama_perangkat: document.getElementById('editNama').value, tipe: document.getElementById('editTipe').value, ip_address: document.getElementById('editIp').value || '-', lokasi: document.getElementById('editLokasi').value, info_port: document.getElementById('editPort').value, kode_otb: document.getElementById('editOtb').value, status: document.getElementById('editStatus').value };
-            try {
-                const res = await fetchAPI('updateNetworkData', { originalData: originalSelectedNode, updatedData, email: session.email });
-                if (res.success) { showToast(res.message, 'success'); toggleEditModal(); triggerServerSearch(); refreshDashboardStats(); } 
-                else showToast(res.message, 'error');
-            } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('submitEditBtn', false, '<i class="fa-solid fa-save"></i> Apply Changes'); }
+            try { const res = await fetchAPI('updateNetworkData', { originalData: originalSelectedNode, updatedData, email: session.email }); if (res.success) { showToast(res.message, 'success'); toggleEditModal(); triggerServerSearch(); refreshDashboardStats(); } else showToast(res.message, 'error'); } 
+            catch (err) { showToast(err.message, 'error'); } finally { setBtnState('submitEditBtn', false, '<i class="fa-solid fa-save"></i> Apply Changes'); }
         }
 
         // ==============================================================
         // EWO MODULE
         // ==============================================================
         async function refreshEWOList() {
-            const lst = document.getElementById('ewoList');
-            lst.innerHTML = '<div class="text-center py-6 text-amber-400"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i></div>';
-            try { const data = await fetchAPI('getEWOData'); renderEWOList(data); } 
-            catch (err) { lst.innerHTML = `<div class="text-center py-4 text-xs text-red-400">Gagal memuat: ${err.message}</div>`; }
+            const lst = document.getElementById('ewoList'); lst.innerHTML = '<div class="text-center py-6 text-amber-400"><i class="fa-solid fa-circle-notch fa-spin text-xl"></i></div>';
+            try { const data = await fetchAPI('getEWOData'); renderEWOList(data); } catch (err) { lst.innerHTML = `<div class="text-center py-4 text-xs text-red-400">Gagal memuat: ${err.message}</div>`; }
         }
 
         function renderEWOList(data) {
-            lastEwoResult = data || [];
-            const container = document.getElementById('ewoList');
+            lastEwoResult = data || []; const container = document.getElementById('ewoList');
             if (!data || data.length === 0) { container.innerHTML = '<div class="text-center text-zinc-500 py-3 text-xs italic">No EWO records.</div>'; return; }
             let html = '';
             data.forEach(item => {
@@ -1177,55 +1095,35 @@
         }
 
         async function handleEWOInput(e) {
-            e.preventDefault(); 
-            if (!isAdmin) return showToast('Akses ditolak', 'error');
+            e.preventDefault(); if (!isAdmin) return showToast('Akses ditolak', 'error');
             setBtnState('submitEwoBtn', true);
             const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const dataObj = { no_ewo: document.getElementById('noEwo').value, deskripsi: document.getElementById('deskEwo').value, status: document.getElementById('statEwo').value };
-            try {
-                const res = await fetchAPI('insertEWOData', { dataObj, email: session.email });
-                if (res.success) { showToast(res.message, 'success'); document.getElementById('ewoInputForm').reset(); refreshEWOList(); } 
-                else showToast(res.message, 'error');
-            } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('submitEwoBtn', false, '<i class="fa-solid fa-plus mr-1"></i> Create EWO'); }
+            try { const res = await fetchAPI('insertEWOData', { dataObj, email: session.email }); if (res.success) { showToast(res.message, 'success'); document.getElementById('ewoInputForm').reset(); refreshEWOList(); } else showToast(res.message, 'error'); } 
+            catch (err) { showToast(err.message, 'error'); } finally { setBtnState('submitEwoBtn', false, '<i class="fa-solid fa-plus mr-1"></i> Create EWO'); }
         }
 
-        function openEditEWO(no_ewo, deskripsi) { 
-            if (!isAdmin) return;
-            originalSelectedEWO = {no_ewo, deskripsi}; document.getElementById('editEwoNo').value = no_ewo; document.getElementById('editEwoDesk').value = deskripsi; animateModalOpen('editEwoModal', 'editEwoModalContent'); 
-        }
+        function openEditEWO(no_ewo, deskripsi) { if (!isAdmin) return; originalSelectedEWO = {no_ewo, deskripsi}; document.getElementById('editEwoNo').value = no_ewo; document.getElementById('editEwoDesk').value = deskripsi; animateModalOpen('editEwoModal', 'editEwoModalContent'); }
         function closeEditEWO() { animateModalClose('editEwoModal', 'editEwoModalContent'); }
-        
         async function handleUpdateEWO(e) {
-            e.preventDefault(); 
-            if (!isAdmin) return showToast('Akses ditolak', 'error');
-            setBtnState('submitEditEwoBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            e.preventDefault(); if (!isAdmin) return showToast('Akses ditolak', 'error');
+            setBtnState('submitEditEwoBtn', true); const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const updated = { no_ewo: document.getElementById('editEwoNo').value, deskripsi: document.getElementById('editEwoDesk').value, status: document.getElementById('editEwoStat').value };
-            try {
-                const res = await fetchAPI('updateEWOData', { originalData: originalSelectedEWO, updatedData: updated, email: session.email });
-                if (res.success) { showToast(res.message, 'success'); closeEditEWO(); refreshEWOList(); } 
-                else showToast(res.message, 'error');
-            } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('submitEditEwoBtn', false, '<i class="fa-solid fa-save mr-1"></i> Save EWO'); }
+            try { const res = await fetchAPI('updateEWOData', { originalData: originalSelectedEWO, updatedData: updated, email: session.email }); if (res.success) { showToast(res.message, 'success'); closeEditEWO(); refreshEWOList(); } else showToast(res.message, 'error'); } 
+            catch (err) { showToast(err.message, 'error'); } finally { setBtnState('submitEditEwoBtn', false, '<i class="fa-solid fa-save mr-1"></i> Save EWO'); }
         }
 
         // ==============================================================
         // OTDR MANAGER
         // ==============================================================
         async function refreshOTDRList(page) {
-            const lst = document.getElementById('otdrList');
-            lst.innerHTML = '<div class="text-center py-8 text-purple-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
+            const lst = document.getElementById('otdrList'); lst.innerHTML = '<div class="text-center py-8 text-purple-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
             try {
-                const res = await fetchAPI('getOTDRData', { page });
-                currentOtdrPage = res.currentPage; totalOtdrPages = res.totalPages;
-                document.getElementById('otdrPageInfo').innerText = `Page ${currentOtdrPage} of ${totalOtdrPages}`;
-                document.getElementById('otdrPrevBtn').disabled = currentOtdrPage <= 1; document.getElementById('otdrNextBtn').disabled = currentOtdrPage >= totalOtdrPages;
-                document.getElementById('selectAllOtdr').checked = false;
-                renderOTDRList(res.data);
+                const res = await fetchAPI('getOTDRData', { page }); currentOtdrPage = res.currentPage; totalOtdrPages = res.totalPages;
+                document.getElementById('otdrPageInfo').innerText = `Page ${currentOtdrPage} of ${totalOtdrPages}`; document.getElementById('otdrPrevBtn').disabled = currentOtdrPage <= 1; document.getElementById('otdrNextBtn').disabled = currentOtdrPage >= totalOtdrPages;
+                document.getElementById('selectAllOtdr').checked = false; renderOTDRList(res.data);
             } catch (err) { lst.innerHTML = `<div class="text-center py-4 text-xs text-red-400">Gagal memuat OTDR: ${err.message}</div>`; }
         }
-
         function changeOTDRPage(dir) { refreshOTDRList(currentOtdrPage + dir); }
         function toggleFolderContent(headerEl) {
             const content = headerEl.nextElementSibling; const chevron = headerEl.querySelector('.chevron-icon'); const folderIcon = headerEl.querySelector('.folder-icon');
@@ -1234,10 +1132,8 @@
         }
 
         function renderOTDRList(data) {
-            const lst = document.getElementById('otdrList');
-            if (!data || data.length === 0) { lst.innerHTML = '<div class="text-zinc-500 italic text-center py-6 text-sm">Belum ada file OTDR.</div>'; return; }
+            const lst = document.getElementById('otdrList'); if (!data || data.length === 0) { lst.innerHTML = '<div class="text-zinc-500 italic text-center py-6 text-sm">Belum ada file OTDR.</div>'; return; }
             let folders = {}; data.forEach(item => { let f = item.nama_folder || 'Umum'; if (!folders[f]) folders[f] = []; folders[f].push(item); });
-            
             let html = '';
             for (let fName in folders) {
                 let folderActionHTML = '';
@@ -1247,14 +1143,8 @@
                 }
                 html += `
                 <div class="border border-zinc-800 rounded-xl overflow-hidden bg-dark-900/80 text-sm shadow-md">
-                    <div onclick="toggleFolderContent(this)" class="bg-dark-800 px-4 py-3 font-bold text-zinc-300 flex items-center justify-between cursor-pointer hover:bg-dark-700 transition">
-                        <span class="flex items-center truncate flex-1 pr-2">
-                            <i class="fa-solid fa-folder text-purple-400 mr-2.5 text-lg folder-icon"></i><span class="truncate">${fName}</span><span class="ml-3 text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/20">${folders[fName].length} Files</span>
-                        </span>
-                        <div class="flex items-center">${folderActionHTML}<i class="fa-solid fa-chevron-down text-zinc-500 transition-transform chevron-icon text-xs"></i></div>
-                    </div>
+                    <div onclick="toggleFolderContent(this)" class="bg-dark-800 px-4 py-3 font-bold text-zinc-300 flex items-center justify-between cursor-pointer hover:bg-dark-700 transition"><span class="flex items-center truncate flex-1 pr-2"><i class="fa-solid fa-folder text-purple-400 mr-2.5 text-lg folder-icon"></i><span class="truncate">${fName}</span><span class="ml-3 text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/20">${folders[fName].length} Files</span></span><div class="flex items-center">${folderActionHTML}<i class="fa-solid fa-chevron-down text-zinc-500 transition-transform chevron-icon text-xs"></i></div></div>
                     <div class="p-3 space-y-2 hidden">`;
-                
                 folders[fName].forEach(item => {
                     let fileActionHTML = '';
                     if (isAdmin) {
@@ -1263,14 +1153,8 @@
                     }
                     html += `
                         <div class="fast-card p-3 rounded-lg flex items-center justify-between gap-3 shadow-inner">
-                            <div class="flex items-center gap-3 flex-1 min-w-0">
-                                <input type="checkbox" class="otdr-checkbox w-4 h-4 rounded border-zinc-700 bg-dark-900 accent-purple-500 cursor-pointer shrink-0" data-url="${item.file_url}">
-                                <div class="truncate"><span class="font-bold text-white text-xs block truncate">${item.nama_otb}</span><span class="text-zinc-500 text-[10px] block truncate">${item.lokasi}</span></div>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <a href="${item.file_url}" target="_blank" class="px-2.5 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/30 rounded-md text-[10px] font-bold whitespace-nowrap transition"><i class="fa-solid fa-download mr-1"></i> SOR</a>
-                                ${fileActionHTML}
-                            </div>
+                            <div class="flex items-center gap-3 flex-1 min-w-0"><input type="checkbox" class="otdr-checkbox w-4 h-4 rounded border-zinc-700 bg-dark-900 accent-purple-500 cursor-pointer shrink-0" data-url="${item.file_url}"><div class="truncate"><span class="font-bold text-white text-xs block truncate">${item.nama_otb}</span><span class="text-zinc-500 text-[10px] block truncate">${item.lokasi}</span></div></div>
+                            <div class="flex items-center gap-2 shrink-0"><a href="${item.file_url}" target="_blank" class="px-2.5 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/30 rounded-md text-[10px] font-bold whitespace-nowrap transition"><i class="fa-solid fa-download mr-1"></i> SOR</a>${fileActionHTML}</div>
                         </div>`;
                 });
                 html += `</div></div>`;
@@ -1279,84 +1163,42 @@
         }
 
         function toggleAllOTDR(cbx) { document.querySelectorAll('.otdr-checkbox').forEach(cb => cb.checked = cbx.checked); }
-        function downloadSelectedOTDR() {
-            const cbs = document.querySelectorAll('.otdr-checkbox:checked');
-            if (cbs.length === 0) return showToast('Pilih file dulu!', 'error');
-            cbs.forEach(cb => { if (cb.dataset.url && cb.dataset.url !== '#') window.open(cb.dataset.url, '_blank'); });
-            showToast(`${cbs.length} file dibuka.`, 'success');
-        }
-
-        function updateFileList(input) {
-            const prompt = document.getElementById('fileUploadPrompt'); const list = document.getElementById('fileUploadList');
-            if (input.files && input.files.length > 0) { prompt.classList.add('hidden'); list.classList.remove('hidden'); list.innerText = `${input.files.length} berkas dipilih`; } 
-            else { list.classList.add('hidden'); prompt.classList.remove('hidden'); }
-        }
-
+        function downloadSelectedOTDR() { const cbs = document.querySelectorAll('.otdr-checkbox:checked'); if (cbs.length === 0) return showToast('Pilih file dulu!', 'error'); cbs.forEach(cb => { if (cb.dataset.url && cb.dataset.url !== '#') window.open(cb.dataset.url, '_blank'); }); showToast(`${cbs.length} file dibuka.`, 'success'); }
+        function updateFileList(input) { const prompt = document.getElementById('fileUploadPrompt'); const list = document.getElementById('fileUploadList'); if (input.files && input.files.length > 0) { prompt.classList.add('hidden'); list.classList.remove('hidden'); list.innerText = `${input.files.length} berkas dipilih`; } else { list.classList.add('hidden'); prompt.classList.remove('hidden'); } }
         const readFileAsBase64 = (file) => { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => resolve(e.target.result); reader.onerror = (e) => reject(e); reader.readAsDataURL(file); }); };
 
         async function handleOTDRBatchUpload(e) {
-            e.preventDefault();
-            if (!isAdmin) return showToast('Akses ditolak', 'error');
-            const fileInput = document.getElementById('fileOtdr');
-            if (!fileInput.files || fileInput.files.length === 0) return showToast('Pilih setidaknya 1 file .sor!', 'error');
-
-            const files = Array.from(fileInput.files); const totalFiles = files.length;
-            const btn = document.getElementById('submitOtdrBtn');
-            const progressBox = document.getElementById('uploadProgressContainer'); const progressBar = document.getElementById('uploadProgressBar');
-            const progressStatus = document.getElementById('uploadProgressStatus'); const progressPercent = document.getElementById('uploadProgressPercent');
+            e.preventDefault(); if (!isAdmin) return showToast('Akses ditolak', 'error');
+            const fileInput = document.getElementById('fileOtdr'); if (!fileInput.files || fileInput.files.length === 0) return showToast('Pilih setidaknya 1 file .sor!', 'error');
+            const files = Array.from(fileInput.files); const totalFiles = files.length; const btn = document.getElementById('submitOtdrBtn');
+            const progressBox = document.getElementById('uploadProgressContainer'); const progressBar = document.getElementById('uploadProgressBar'); const progressStatus = document.getElementById('uploadProgressStatus'); const progressPercent = document.getElementById('uploadProgressPercent');
             const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
-            const otbVal = document.getElementById('otbOtdr').value.trim(); const lokasiVal = document.getElementById('lokasiOtdr').value.trim();
-            let folderVal = document.getElementById('folderOtdr').value.trim(); if (!folderVal) folderVal = `OTDR - ${lokasiVal} - ${otbVal}`;
+            const otbVal = document.getElementById('otbOtdr').value.trim(); const lokasiVal = document.getElementById('lokasiOtdr').value.trim(); let folderVal = document.getElementById('folderOtdr').value.trim(); if (!folderVal) folderVal = `OTDR - ${lokasiVal} - ${otbVal}`;
 
-            btn.disabled = true; btn.classList.add('opacity-50'); progressBox.classList.remove('hidden');
-            let successCount = 0, failCount = 0;
-
+            btn.disabled = true; btn.classList.add('opacity-50'); progressBox.classList.remove('hidden'); let successCount = 0, failCount = 0;
             for (let i = 0; i < totalFiles; i++) {
                 const file = files[i]; const currentIdx = i + 1; const percent = Math.round((currentIdx / totalFiles) * 100);
                 progressStatus.innerText = `Mengunggah (${currentIdx}/${totalFiles}): ${file.name}`; progressPercent.innerText = `${percent}%`; progressBar.style.width = `${percent}%`;
-
-                try {
-                    const base64Data = await readFileAsBase64(file);
-                    const res = await fetchAPI('uploadSingleOTDR', { fileItem: { fileName: file.name, fileData: base64Data }, folderName: folderVal, otbName: otbVal, location: lokasiVal, userEmail: session.email });
-                    if (res && res.success) successCount++; else failCount++;
-                } catch (err) { failCount++; }
+                try { const base64Data = await readFileAsBase64(file); const res = await fetchAPI('uploadSingleOTDR', { fileItem: { fileName: file.name, fileData: base64Data }, folderName: folderVal, otbName: otbVal, location: lokasiVal, userEmail: session.email }); if (res && res.success) successCount++; else failCount++; } catch (err) { failCount++; }
             }
-
             btn.disabled = false; btn.classList.remove('opacity-50'); progressBox.classList.add('hidden'); progressBar.style.width = '0%';
-            if (successCount > 0) { showToast(`${successCount} file SOR berhasil diunggah!`, 'success'); document.getElementById('otdrInputForm').reset(); updateFileList(document.getElementById('fileOtdr')); refreshOTDRList(1); } 
-            else showToast(`Gagal mengunggah ${failCount} file.`, 'error');
+            if (successCount > 0) { showToast(`${successCount} file SOR berhasil diunggah!`, 'success'); document.getElementById('otdrInputForm').reset(); updateFileList(document.getElementById('fileOtdr')); refreshOTDRList(1); } else showToast(`Gagal mengunggah ${failCount} file.`, 'error');
         }
 
         function openEditOTDR(otb, timestamp, folder, lokasi) { if(!isAdmin)return; originalSelectedOTDR = {nama_otb: otb, timestamp: timestamp}; document.getElementById('editOtdrFolder').value = folder && folder !== 'undefined' ? folder : 'Umum'; document.getElementById('editOtdrOtb').value = otb; document.getElementById('editOtdrLokasi').value = lokasi; animateModalOpen('editOtdrModal', 'editOtdrModalContent'); }
         function closeEditOTDR() { animateModalClose('editOtdrModal', 'editOtdrModalContent'); }
-        
         async function handleUpdateOTDR(e) {
-            e.preventDefault(); 
-            if (!isAdmin) return showToast('Akses ditolak', 'error');
-            setBtnState('submitEditOtdrBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            e.preventDefault(); if (!isAdmin) return showToast('Akses ditolak', 'error'); setBtnState('submitEditOtdrBtn', true); const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const updated = { nama_folder: document.getElementById('editOtdrFolder').value, nama_otb: document.getElementById('editOtdrOtb').value, lokasi: document.getElementById('editOtdrLokasi').value };
-            try {
-                const res = await fetchAPI('updateOTDRData', { originalData: originalSelectedOTDR, updatedData: updated, email: session.email });
-                if (res.success) { showToast(res.message, 'success'); closeEditOTDR(); refreshOTDRList(currentOtdrPage); } else showToast(res.message, 'error');
-            } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('submitEditOtdrBtn', false, '<i class="fa-solid fa-save mr-1"></i> Save Changes'); }
+            try { const res = await fetchAPI('updateOTDRData', { originalData: originalSelectedOTDR, updatedData: updated, email: session.email }); if (res.success) { showToast(res.message, 'success'); closeEditOTDR(); refreshOTDRList(currentOtdrPage); } else showToast(res.message, 'error'); } catch (err) { showToast(err.message, 'error'); } finally { setBtnState('submitEditOtdrBtn', false, '<i class="fa-solid fa-save mr-1"></i> Save Changes'); }
         }
 
         function openEditOTDRFolder(folderName) { if(!isAdmin)return; originalSelectedOTDRFolder = folderName; document.getElementById('editOtdrFolderNewName').value = folderName; animateModalOpen('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
         function closeEditOTDRFolder() { animateModalClose('editOtdrFolderModal', 'editOtdrFolderModalContent'); }
-        
         async function handleUpdateOTDRFolder(e) {
-            e.preventDefault(); 
-            if (!isAdmin) return showToast('Akses ditolak', 'error');
-            setBtnState('submitEditOtdrFolderBtn', true);
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
+            e.preventDefault(); if (!isAdmin) return showToast('Akses ditolak', 'error'); setBtnState('submitEditOtdrFolderBtn', true); const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const newFolderName = document.getElementById('editOtdrFolderNewName').value;
-            try {
-                const res = await fetchAPI('updateOTDRFolder', { oldFolderName: originalSelectedOTDRFolder, newFolderName, email: session.email });
-                if (res.success) { showToast(res.message, 'success'); closeEditOTDRFolder(); refreshOTDRList(currentOtdrPage); } else showToast(res.message, 'error');
-            } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('submitEditOtdrFolderBtn', false, '<i class="fa-solid fa-save mr-1"></i> Apply Rename'); }
+            try { const res = await fetchAPI('updateOTDRFolder', { oldFolderName: originalSelectedOTDRFolder, newFolderName, email: session.email }); if (res.success) { showToast(res.message, 'success'); closeEditOTDRFolder(); refreshOTDRList(currentOtdrPage); } else showToast(res.message, 'error'); } catch (err) { showToast(err.message, 'error'); } finally { setBtnState('submitEditOtdrFolderBtn', false, '<i class="fa-solid fa-save mr-1"></i> Apply Rename'); }
         }
 
         // ==============================================================
@@ -1369,164 +1211,77 @@
         function confirmDeleteOTDRFolder(folderName) { if(!isAdmin)return; originalSelectedOTDRFolder = folderName; deleteTargetType = 'OTDR_FOLDER'; document.getElementById('deleteContextType').innerText = `Hapus Folder ${folderName}?`; animateModalOpen('confirmDeleteModal', 'confirmDeleteModalContent'); }
 
         async function executeDeleteData() {
-            if (!isAdmin) return showToast('Akses Ditolak', 'error');
-            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
-            setBtnState('confirmDeleteBtn', true);
+            if (!isAdmin) return showToast('Akses Ditolak', 'error'); const session = JSON.parse(localStorage.getItem('netcore_session') || '{}'); setBtnState('confirmDeleteBtn', true);
             try {
                 let res;
                 if (deleteTargetType === 'NODE') { res = await fetchAPI('deleteNetworkData', { targetData: originalSelectedNode, email: session.email }); if (res.success) { triggerServerSearch(); refreshDashboardStats(); } } 
                 else if (deleteTargetType === 'EWO') { res = await fetchAPI('deleteEWOData', { targetData: originalSelectedEWO, email: session.email }); if (res.success) refreshEWOList(); } 
                 else if (deleteTargetType === 'OTDR_FILE') { res = await fetchAPI('deleteOTDRData', { targetData: originalSelectedOTDR, email: session.email }); if (res.success) refreshOTDRList(currentOtdrPage); } 
                 else if (deleteTargetType === 'OTDR_FOLDER') { res = await fetchAPI('deleteOTDRFolder', { folderName: originalSelectedOTDRFolder, email: session.email }); if (res.success) refreshOTDRList(currentOtdrPage); }
-                
                 if (res && res.success) showToast(res.message, 'success'); else if (res) showToast(res.message, 'error');
-            } catch (err) { showToast(err.message, 'error'); } 
-            finally { setBtnState('confirmDeleteBtn', false, 'Ya, Hapus'); closeDeleteModal(); }
+            } catch (err) { showToast(err.message, 'error'); } finally { setBtnState('confirmDeleteBtn', false, 'Ya, Hapus'); closeDeleteModal(); }
         }
 
         // ==============================================================
         // GPS TRACKER & ACTIVITY LOGS
         // ==============================================================
-        function startHiddenGPS(email) {
-            clearInterval(gpsTrackerInterval);
-            if (!navigator.geolocation) return;
-            const sendLocation = () => { navigator.geolocation.getCurrentPosition((pos) => { fetchAPI('updateLocation', { email, lat: pos.coords.latitude, lng: pos.coords.longitude }).catch(() => {}); }, () => {}, { enableHighAccuracy: true, maximumAge: 15000, timeout: 8000 }); };
-            sendLocation(); gpsTrackerInterval = setInterval(sendLocation, 180000); // 3 menit
-        }
+        function startHiddenGPS(email) { clearInterval(gpsTrackerInterval); if (!navigator.geolocation) return; const sendLocation = () => { navigator.geolocation.getCurrentPosition((pos) => { fetchAPI('updateLocation', { email, lat: pos.coords.latitude, lng: pos.coords.longitude }).catch(() => {}); }, () => {}, { enableHighAccuracy: true, maximumAge: 15000, timeout: 8000 }); }; sendLocation(); gpsTrackerInterval = setInterval(sendLocation, 180000); }
         function stopHiddenGPS() { if (gpsTrackerInterval) { clearInterval(gpsTrackerInterval); gpsTrackerInterval = null; } }
-
         function openTrackerModal() { if(!isOwner)return; animateModalOpen('trackerModal', 'trackerModalContent'); refreshTrackerData(); }
         function closeTrackerModal() { animateModalClose('trackerModal', 'trackerModalContent'); }
 
         async function refreshTrackerData() {
-            if(!isOwner) return;
-            const syncIcon = document.getElementById('trackerSyncIcon'); 
-            const container = document.getElementById('trackerContainer');
-            if (syncIcon) syncIcon.classList.add('fa-spin'); 
-            container.innerHTML = '<div class="text-center py-8 text-emerald-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
-            
+            if(!isOwner) return; const syncIcon = document.getElementById('trackerSyncIcon'); const container = document.getElementById('trackerContainer');
+            if (syncIcon) syncIcon.classList.add('fa-spin'); container.innerHTML = '<div class="text-center py-8 text-emerald-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
             try {
-                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
-                let rawData = await fetchAPI('getLocations', { email: session.email });
-                
-                if (typeof rawData === 'string') { try { rawData = JSON.parse(rawData); } catch(e){} }
-                let dataList = Array.isArray(rawData) ? rawData : (rawData.data || rawData.locations || []);
-
-                if (!dataList || dataList.length === 0) { 
-                    container.innerHTML = '<div class="text-center text-sm text-zinc-500 py-6">Belum ada lokasi terekam.</div>'; 
-                    return; 
-                }
-
+                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}'); let rawData = await fetchAPI('getLocations', { email: session.email });
+                if (typeof rawData === 'string') { try { rawData = JSON.parse(rawData); } catch(e){} } let dataList = Array.isArray(rawData) ? rawData : (rawData.data || rawData.locations || []);
+                if (!dataList || dataList.length === 0) { container.innerHTML = '<div class="text-center text-sm text-zinc-500 py-6">Belum ada lokasi terekam.</div>'; return; }
                 let html = '';
-                dataList.forEach(loc => {
-                    const user = loc.email || loc.user || loc.nama || 'User';
-                    const time = loc.timestamp || loc.waktu || loc.tanggal || '-';
-                    const lat = loc.lat || loc.latitude;
-                    const lng = loc.lng || loc.longitude;
-                    if(!lat || !lng) return;
-
-                    html += `
-                    <div class="fast-card p-4 rounded-xl flex items-center justify-between gap-3 shadow-md">
-                        <div class="truncate flex-1 pr-2">
-                            <span class="text-sm font-bold text-white block truncate mb-1">${user}</span>
-                            <span class="text-[10px] text-zinc-500 font-mono">${time}</span>
-                        </div>
-                        <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-lg text-[10px] font-bold shrink-0 transition flex items-center">
-                            <i class="fa-solid fa-map-pin mr-1.5"></i> Maps
-                        </a>
-                    </div>`;
+                dataList.forEach(loc => { const user = loc.email || loc.user || loc.nama || 'User'; const time = loc.timestamp || loc.waktu || loc.tanggal || '-'; const lat = loc.lat || loc.latitude; const lng = loc.lng || loc.longitude; if(!lat || !lng) return;
+                    html += `<div class="fast-card p-4 rounded-xl flex items-center justify-between gap-3 shadow-md"><div class="truncate flex-1 pr-2"><span class="text-sm font-bold text-white block truncate mb-1">${user}</span><span class="text-[10px] text-zinc-500 font-mono">${time}</span></div><a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-lg text-[10px] font-bold shrink-0 transition flex items-center"><i class="fa-solid fa-map-pin mr-1.5"></i> Maps</a></div>`;
                 });
                 container.innerHTML = html || '<div class="text-center text-sm text-zinc-500 py-6">Data lokasi tidak sesuai format.</div>';
-            } catch (err) { 
-                container.innerHTML = `<p class="text-center text-xs text-red-400">Gagal memuat: ${err.message}</p>`; 
-            } finally { 
-                if (syncIcon) syncIcon.classList.remove('fa-spin'); 
-            }
+            } catch (err) { container.innerHTML = `<p class="text-center text-xs text-red-400">Gagal memuat: ${err.message}</p>`; } finally { if (syncIcon) syncIcon.classList.remove('fa-spin'); }
         }
 
         async function openActivityLogModal() {
-            if(!isOwner) return;
-            animateModalOpen('activityLogModal', 'activityLogModalContent');
-            const container = document.getElementById('activityLogContainer'); 
-            container.innerHTML = '<div class="text-center py-8 text-blue-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
-            
+            if(!isOwner) return; animateModalOpen('activityLogModal', 'activityLogModalContent'); const container = document.getElementById('activityLogContainer'); container.innerHTML = '<div class="text-center py-8 text-blue-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
             try {
-                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
-                let rawData = await fetchAPI('getActivityLogs', { email: session.email });
-                
-                if (typeof rawData === 'string') { try { rawData = JSON.parse(rawData); } catch(e){} }
-                let dataList = Array.isArray(rawData) ? rawData : (rawData.data || rawData.logs || []);
-
-                if (!dataList || dataList.length === 0) { 
-                    container.innerHTML = '<div class="text-center text-sm text-zinc-500 py-6">Belum ada log aktivitas.</div>'; 
-                    return; 
-                }
-                
+                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}'); let rawData = await fetchAPI('getActivityLogs', { email: session.email });
+                if (typeof rawData === 'string') { try { rawData = JSON.parse(rawData); } catch(e){} } let dataList = Array.isArray(rawData) ? rawData : (rawData.data || rawData.logs || []);
+                if (!dataList || dataList.length === 0) { container.innerHTML = '<div class="text-center text-sm text-zinc-500 py-6">Belum ada log aktivitas.</div>'; return; }
                 let html = '';
                 dataList.forEach(log => {
-                    const action = log.action || log.aksi || log.tipe || 'SISTEM';
-                    const time = log.timestamp || log.waktu || log.tanggal || '-';
-                    const desc = log.description || log.deskripsi || log.detail || '-';
-                    const user = log.email || log.user || '-';
-
-                    let badge = 'text-blue-400 bg-blue-500/10 border-blue-500/30';
-                    if (action.toUpperCase().includes('DELETE') || action.toUpperCase().includes('HAPUS')) badge = 'text-red-400 bg-red-500/10 border-red-500/30';
-                    else if (action.toUpperCase().includes('UPDATE') || action.toUpperCase().includes('EDIT')) badge = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
-                    else if (action.toUpperCase().includes('INSERT') || action.toUpperCase().includes('TAMBAH') || action.toUpperCase().includes('UPLOAD')) badge = 'text-accent-400 bg-accent-500/10 border-accent-500/30';
-
-                    html += `
-                    <div class="fast-card p-4 rounded-xl text-sm space-y-2 shadow-sm">
-                        <div class="flex justify-between items-center text-[10px]">
-                            <span class="px-2 py-0.5 rounded border font-bold tracking-wider uppercase ${badge}">${action}</span>
-                            <span class="text-zinc-500 font-mono">${time}</span>
-                        </div>
-                        <p class="text-zinc-300 font-medium leading-relaxed">${desc}</p>
-                        <span class="text-[10px] text-zinc-500 font-mono block border-t border-zinc-800/50 pt-2"><i class="fa-solid fa-user mr-1.5"></i>${user}</span>
-                    </div>`;
+                    const action = log.action || log.aksi || log.tipe || 'SISTEM'; const time = log.timestamp || log.waktu || log.tanggal || '-'; const desc = log.description || log.deskripsi || log.detail || '-'; const user = log.email || log.user || '-';
+                    let badge = 'text-blue-400 bg-blue-500/10 border-blue-500/30'; if (action.toUpperCase().includes('DELETE') || action.toUpperCase().includes('HAPUS')) badge = 'text-red-400 bg-red-500/10 border-red-500/30'; else if (action.toUpperCase().includes('UPDATE') || action.toUpperCase().includes('EDIT')) badge = 'text-amber-400 bg-amber-500/10 border-amber-500/30'; else if (action.toUpperCase().includes('INSERT') || action.toUpperCase().includes('TAMBAH') || action.toUpperCase().includes('UPLOAD')) badge = 'text-accent-400 bg-accent-500/10 border-accent-500/30';
+                    html += `<div class="fast-card p-4 rounded-xl text-sm space-y-2 shadow-sm"><div class="flex justify-between items-center text-[10px]"><span class="px-2 py-0.5 rounded border font-bold tracking-wider uppercase ${badge}">${action}</span><span class="text-zinc-500 font-mono">${time}</span></div><p class="text-zinc-300 font-medium leading-relaxed">${desc}</p><span class="text-[10px] text-zinc-500 font-mono block border-t border-zinc-800/50 pt-2"><i class="fa-solid fa-user mr-1.5"></i>${user}</span></div>`;
                 });
                 container.innerHTML = html;
-            } catch (err) { 
-                container.innerHTML = `<p class="text-center text-xs text-red-400">Gagal memuat: ${err.message}</p>`; 
-            }
+            } catch (err) { container.innerHTML = `<p class="text-center text-xs text-red-400">Gagal memuat: ${err.message}</p>`; }
         }
-        
         function closeActivityLogModal() { animateModalClose('activityLogModal', 'activityLogModalContent'); }
 
         // ==============================================================
         // EXPORT EXCEL
         // ==============================================================
         async function exportTableToExcelTemplate(format = 'xlsx') {
-            if (!isAdmin) return showToast('Akses ditolak', 'error');
-            showToast('Menyiapkan export...', 'info');
-            const filters = { type: currentFilter, nama: document.getElementById('searchNama').value, lokasi: document.getElementById('searchLokasi').value, port: document.getElementById('searchPort').value, otb: document.getElementById('searchOtb').value };
+            if (!isAdmin) return showToast('Akses ditolak', 'error'); showToast('Menyiapkan export...', 'info'); const filters = { type: currentFilter, nama: document.getElementById('searchNama').value, lokasi: document.getElementById('searchLokasi').value, port: document.getElementById('searchPort').value, otb: document.getElementById('searchOtb').value };
             try {
-                const fullData = await fetchAPI('getAllNetworkDataForExport', { filters });
-                if (!fullData || fullData.length === 0) return showToast('Tidak ada data!', 'error');
-                const now = new Date();
+                const fullData = await fetchAPI('getAllNetworkDataForExport', { filters }); if (!fullData || fullData.length === 0) return showToast('Tidak ada data!', 'error'); const now = new Date();
                 const templateRows = [ ["NETCORE ISP - DATABASE REPORT"], [`Tanggal: ${now.toLocaleString('id-ID')}`], [`Filter: ${currentFilter} | Total: ${fullData.length}`], [], ["NO", "NAMA PERANGKAT", "TIPE", "IP ADDRESS", "LOKASI", "PORT INFO", "KODE OTB", "STATUS"] ];
                 fullData.forEach((item, index) => { templateRows.push([index + 1, item.nama_perangkat || '-', item.tipe || '-', item.ip_address || '-', item.lokasi || '-', item.info_port || '-', item.kode_otb || '-', item.status || '-']); });
-
-                if (format === 'csv' || typeof XLSX === 'undefined') {
-                    let csv = "\uFEFF"; templateRows.forEach(row => { csv += row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",") + "\n"; });
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Netcore_Data_${currentFilter}.csv`; link.click(); showToast('CSV Exported', 'success');
-                } else {
-                    const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(templateRows); XLSX.utils.book_append_sheet(wb, ws, `Data_${currentFilter}`); XLSX.writeFile(wb, `Netcore_Data_${currentFilter}.xlsx`); showToast('Excel Exported', 'success');
-                }
+                if (format === 'csv' || typeof XLSX === 'undefined') { let csv = "\uFEFF"; templateRows.forEach(row => { csv += row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",") + "\n"; }); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Netcore_Data_${currentFilter}.csv`; link.click(); showToast('CSV Exported', 'success'); } 
+                else { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(templateRows); XLSX.utils.book_append_sheet(wb, ws, `Data_${currentFilter}`); XLSX.writeFile(wb, `Netcore_Data_${currentFilter}.xlsx`); showToast('Excel Exported', 'success'); }
             } catch (err) { showToast('Gagal export: ' + err.message, 'error'); }
         }
 
         function exportEWOToExcel(format = 'xlsx') {
-            if (!isAdmin) return showToast('Akses ditolak', 'error');
-            if (!lastEwoResult || lastEwoResult.length === 0) return showToast('Data EWO kosong!', 'error');
+            if (!isAdmin) return showToast('Akses ditolak', 'error'); if (!lastEwoResult || lastEwoResult.length === 0) return showToast('Data EWO kosong!', 'error');
             const templateRows = [ ["NETCORE ISP - EWO REPORT"], [`Tanggal: ${new Date().toLocaleString('id-ID')}`], [`Total: ${lastEwoResult.length}`], [], ["NO", "NOMOR EWO", "DESKRIPSI", "STATUS"] ];
             lastEwoResult.forEach((item, index) => { templateRows.push([index + 1, item.no_ewo || '-', item.deskripsi || '-', item.status || '-']); });
-            
-            if (format === 'csv' || typeof XLSX === 'undefined') {
-                let csv = "\uFEFF"; templateRows.forEach(row => { csv += row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",") + "\n"; });
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Netcore_EWO.csv`; link.click(); showToast('EWO CSV Exported', 'success');
-            } else {
-                const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(templateRows); XLSX.utils.book_append_sheet(wb, ws, `EWO`); XLSX.writeFile(wb, `Netcore_EWO.xlsx`); showToast('EWO Excel Exported', 'success');
-            }
+            if (format === 'csv' || typeof XLSX === 'undefined') { let csv = "\uFEFF"; templateRows.forEach(row => { csv += row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",") + "\n"; }); const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Netcore_EWO.csv`; link.click(); showToast('EWO CSV Exported', 'success'); } 
+            else { const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(templateRows); XLSX.utils.book_append_sheet(wb, ws, `EWO`); XLSX.writeFile(wb, `Netcore_EWO.xlsx`); showToast('EWO Excel Exported', 'success'); }
         }
 
         // ==============================================================
@@ -1540,36 +1295,29 @@
                 try {
                     const view = new DataView(buffer); const bytes = new Uint8Array(buffer); let mapPtr = -1;
                     for (let i = 0; i < bytes.length - 10; i++) { if (bytes[i] === 77 && bytes[i+1] === 97 && bytes[i+2] === 112 && bytes[i+3] === 0) { mapPtr = i; break; } }
-                    
                     if (mapPtr !== -1) {
                         let ptr = mapPtr + 4; let mapVersion = view.getUint16(ptr, true); ptr += 2; let mapSize = view.getUint32(ptr, true); ptr += 4; let numBlocks = view.getUint16(ptr, true); ptr += 2;
                         let blocks = {}; let nextOffset = mapPtr + mapSize;
                         for (let i = 0; i < numBlocks; i++) {
-                            if (ptr >= bytes.length) break;
-                            let bName = ""; while (bytes[ptr] !== 0 && ptr < bytes.length) { bName += String.fromCharCode(bytes[ptr]); ptr++; } ptr++;
-                            let bVer = view.getUint16(ptr, true); ptr += 2; let bSize = view.getUint32(ptr, true); ptr += 4;
-                            if (bName !== "Map") { blocks[bName] = { offset: nextOffset, size: bSize }; nextOffset += bSize; }
+                            if (ptr >= bytes.length) break; let bName = ""; while (bytes[ptr] !== 0 && ptr < bytes.length) { bName += String.fromCharCode(bytes[ptr]); ptr++; } ptr++;
+                            let bVer = view.getUint16(ptr, true); ptr += 2; let bSize = view.getUint32(ptr, true); ptr += 4; if (bName !== "Map") { blocks[bName] = { offset: nextOffset, size: bSize }; nextOffset += bSize; }
                         }
                         if (blocks["KeyEvents"]) {
                             let ke = blocks["KeyEvents"]; let numEvents = view.getUint16(ke.offset, true); let evPtr = ke.offset + 2; let maxTime = 0; let totalLoss = 0;
                             for (let i = 0; i < numEvents; i++) {
-                                if (evPtr + 28 > bytes.length) break;
-                                let propTime = view.getUint32(evPtr + 2, true); let evLoss = view.getInt16(evPtr + 8, true); 
-                                if (propTime > maxTime) maxTime = propTime; if (evLoss > 0 && evLoss < 5000) totalLoss += evLoss; 
-                                let commentLen = view.getUint16(evPtr + 40, true); evPtr += 42 + commentLen;
+                                if (evPtr + 28 > bytes.length) break; let propTime = view.getUint32(evPtr + 2, true); let evLoss = view.getInt16(evPtr + 8, true); 
+                                if (propTime > maxTime) maxTime = propTime; if (evLoss > 0 && evLoss < 5000) totalLoss += evLoss; let commentLen = view.getUint16(evPtr + 40, true); evPtr += 42 + commentLen;
                             }
                             if (maxTime > 0) { let ior = 1.4677; let distKm = (maxTime * 1e-10) * (299792.458 / ior / 2); extractedDistance = distKm.toFixed(3); isAccurate = true; }
                             if (totalLoss > 0) extractedLoss = "-" + (totalLoss * 0.001).toFixed(2);
                         }
                     }
                 } catch (err) { console.warn("Fallback Teks...", err); }
-                
                 if (!isAccurate || extractedLoss === "N/A") {
                     const bytes = new Uint8Array(buffer); let decoder = new TextDecoder('iso-8859-1'); let rawText = decoder.decode(bytes); let cleanStr = rawText.replace(/[\x00-\x1F\x7F-\xFF]/g, ' '); 
                     if (extractedDistance === "N/A" || !isAccurate) { let distMatch = cleanStr.match(/(?:Length|Span|End|Total|Jarak)[^\d]*?(\d{1,3}(?:[\.,]\d+)?)\s*(?:km|kM|Km|KM)/i); if (distMatch && distMatch[1]) extractedDistance = parseFloat(distMatch[1].replace(',', '.')).toFixed(3); }
                     if (extractedLoss === "N/A") { let lossMatch = cleanStr.match(/(?:Loss|Orl|Attn)[^\d]*?(\d{1,2}(?:[\.,]\d+)?)\s*(?:dB|db|DB)/i); if (lossMatch && lossMatch[1]) extractedLoss = "-" + parseFloat(lossMatch[1].replace(',', '.')).toFixed(2); else if (extractedDistance !== "N/A") extractedLoss = "-" + (parseFloat(extractedDistance) * 0.35).toFixed(2); }
                 }
-                
                 return { fileName: fileName, distance: extractedDistance, loss: extractedLoss, status: isAccurate ? 'Akurat (Biner Map)' : (extractedDistance !== 'N/A' ? 'Akurat (Hybrid Teks)' : 'Gagal Ekstrak') };
             },
             handleBatch: async function(event) {
@@ -1581,8 +1329,7 @@
                     try { const buffer = await this.readFileAsArrayBuffer(file); const extractedJSON = this.parseSorBinary(buffer, file.name); this.results.push(extractedJSON); } 
                     catch (err) { this.results.push({ fileName: file.name, distance: "N/A", loss: "N/A", status: "Corrupted File" }); }
                 }
-                this.renderTable(); 
-                if(isAdmin) document.getElementById('btnSaveSOR').classList.remove('hidden');
+                this.renderTable(); if(isAdmin) document.getElementById('btnSaveSOR').classList.remove('hidden');
             },
             renderTable: function() {
                 const tbody = document.getElementById('sor-results-body'); tbody.innerHTML = '';
@@ -1595,15 +1342,10 @@
                 });
             },
             saveToDatabase: async function() {
-                if (!isAdmin) return showToast('Akses Ditolak', 'error');
-                if (this.results.length === 0) return;
-                setBtnState('btnSaveSOR', true, '<i class="fa-solid fa-database mr-2"></i> Simpan Ekstraksi ke Database Master');
+                if (!isAdmin) return showToast('Akses Ditolak', 'error'); if (this.results.length === 0) return; setBtnState('btnSaveSOR', true, '<i class="fa-solid fa-database mr-2"></i> Simpan Ekstraksi ke Database Master');
                 const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
-                try {
-                    const res = await fetchAPI('saveBatchSOR', { sorArray: this.results, email: session.email || 'admin@netcore.co.id' });
-                    if (res.success) { showToast(res.message, 'success'); document.getElementById('btnSaveSOR').classList.add('hidden'); } else showToast('Gagal menyimpan: ' + res.message, 'error');
-                } catch (err) { showToast('Terjadi kesalahan: ' + err.message, 'error'); } 
-                finally { setBtnState('btnSaveSOR', false); }
+                try { const res = await fetchAPI('saveBatchSOR', { sorArray: this.results, email: session.email || 'admin@netcore.co.id' }); if (res.success) { showToast(res.message, 'success'); document.getElementById('btnSaveSOR').classList.add('hidden'); } else showToast('Gagal menyimpan: ' + res.message, 'error'); } 
+                catch (err) { showToast('Terjadi kesalahan: ' + err.message, 'error'); } finally { setBtnState('btnSaveSOR', false); }
             }
         };
 
