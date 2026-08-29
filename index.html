@@ -112,7 +112,7 @@
                     <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                 </button>
             </form>
-            <p class="text-center text-zinc-600 text-[9px] mt-6 font-medium">Sesi web valid untuk 5 jam. Menutup web akan mereset sesi.</p>
+            <p class="text-center text-zinc-600 text-[9px] mt-6 font-medium">Sesi web valid untuk 8 jam dalam satu perangkat.</p>
         </div>
     </div>
 
@@ -674,9 +674,10 @@
         let gpsTrackerInterval = null;
         let sessionTimerInterval = null;
 
-        window.addEventListener('beforeunload', () => {
-            sessionStorage.removeItem('netcore_session');
-        });
+        // DIHAPUS: Agar sesi persisten dan tidak hilang saat tab ditutup/direload
+        // window.addEventListener('beforeunload', () => {
+        //     sessionStorage.removeItem('netcore_session');
+        // });
 
         // ==============================================================
         // APEX CHARTS INITIALIZATION
@@ -898,7 +899,7 @@
         function closeSorBatchModal() { animateModalClose('sorBatchModal', 'sorBatchModalContent'); }
 
         // ==============================================================
-        // AUTHENTICATION, ROLES & SESSION MANAGEMENT
+        // AUTHENTICATION, ROLES & SESSION MANAGEMENT (UPDATED TO 8 HOURS)
         // ==============================================================
         async function handleLogin(e) {
             e.preventDefault();
@@ -913,7 +914,8 @@
                 
                 if (res.success) {
                     const now = Date.now();
-                    sessionStorage.setItem('netcore_session', JSON.stringify({ email: res.email, role: res.role, loginTime: now }));
+                    // Gunakan localStorage agar sesi tidak hilang ketika tab ditutup
+                    localStorage.setItem('netcore_session', JSON.stringify({ email: res.email, role: res.role, loginTime: now }));
                     localStorage.setItem('netcore_device_history', JSON.stringify({ email: email, password: btoa(encodeURIComponent(password)), loginTime: now }));
                     checkSession();
                 } else {
@@ -927,7 +929,7 @@
         }
 
         function handleLogout(isExpired = false) {
-            sessionStorage.removeItem('netcore_session');
+            localStorage.removeItem('netcore_session'); // Hapus sesi dari localStorage
             clearInterval(sessionTimerInterval);
             stopHiddenGPS();
             
@@ -940,11 +942,12 @@
         function startSessionTimer() {
             clearInterval(sessionTimerInterval);
             sessionTimerInterval = setInterval(() => {
-                const sessionData = sessionStorage.getItem('netcore_session');
+                const sessionData = localStorage.getItem('netcore_session');
                 if (sessionData) {
                     const parsed = JSON.parse(sessionData);
-                    if (Date.now() - parsed.loginTime > 18000000) {
-                        showToast('Waktu sesi 5 jam habis. Silakan Login kembali.', 'error');
+                    // 28.800.000 ms = 8 Jam
+                    if (Date.now() - parsed.loginTime > 28800000) {
+                        showToast('Waktu sesi 8 jam habis. Silakan Login kembali.', 'error');
                         handleLogout();
                     }
                 }
@@ -970,11 +973,12 @@
                 historyBadge.classList.add('hidden');
             }
 
-            const sessionData = sessionStorage.getItem('netcore_session');
+            const sessionData = localStorage.getItem('netcore_session');
             if (sessionData) {
                 const parsed = JSON.parse(sessionData);
                 
-                if (now - parsed.loginTime > 18000000) { handleLogout(true); return; }
+                // 28.800.000 ms = 8 Jam batas kedaluwarsa sesi
+                if (now - parsed.loginTime > 28800000) { handleLogout(true); return; }
 
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('dashboardWrapper').classList.remove('hidden');
@@ -1106,7 +1110,7 @@
             if (!isAdmin) return showToast('Akses ditolak: Memerlukan izin Admin', 'error');
             
             setBtnState('submitInputBtn', true);
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const dataObj = { nama_perangkat: document.getElementById('inputNama').value, tipe: document.getElementById('inputTipe').value, ip_address: document.getElementById('inputIp').value || '-', lokasi: document.getElementById('inputLokasi').value, info_port: document.getElementById('inputPort').value || '-', kode_otb: document.getElementById('inputOtb').value || '-', status: document.getElementById('inputStatus').value };
             try {
                 const res = await fetchAPI('insertNetworkData', { dataObj, email: session.email });
@@ -1130,7 +1134,7 @@
             e.preventDefault();
             if (!isAdmin) return showToast('Akses ditolak', 'error');
             setBtnState('submitEditBtn', true);
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const updatedData = { nama_perangkat: document.getElementById('editNama').value, tipe: document.getElementById('editTipe').value, ip_address: document.getElementById('editIp').value || '-', lokasi: document.getElementById('editLokasi').value, info_port: document.getElementById('editPort').value, kode_otb: document.getElementById('editOtb').value, status: document.getElementById('editStatus').value };
             try {
                 const res = await fetchAPI('updateNetworkData', { originalData: originalSelectedNode, updatedData, email: session.email });
@@ -1176,7 +1180,7 @@
             e.preventDefault(); 
             if (!isAdmin) return showToast('Akses ditolak', 'error');
             setBtnState('submitEwoBtn', true);
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const dataObj = { no_ewo: document.getElementById('noEwo').value, deskripsi: document.getElementById('deskEwo').value, status: document.getElementById('statEwo').value };
             try {
                 const res = await fetchAPI('insertEWOData', { dataObj, email: session.email });
@@ -1196,7 +1200,7 @@
             e.preventDefault(); 
             if (!isAdmin) return showToast('Akses ditolak', 'error');
             setBtnState('submitEditEwoBtn', true);
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const updated = { no_ewo: document.getElementById('editEwoNo').value, deskripsi: document.getElementById('editEwoDesk').value, status: document.getElementById('editEwoStat').value };
             try {
                 const res = await fetchAPI('updateEWOData', { originalData: originalSelectedEWO, updatedData: updated, email: session.email });
@@ -1300,7 +1304,7 @@
             const btn = document.getElementById('submitOtdrBtn');
             const progressBox = document.getElementById('uploadProgressContainer'); const progressBar = document.getElementById('uploadProgressBar');
             const progressStatus = document.getElementById('uploadProgressStatus'); const progressPercent = document.getElementById('uploadProgressPercent');
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const otbVal = document.getElementById('otbOtdr').value.trim(); const lokasiVal = document.getElementById('lokasiOtdr').value.trim();
             let folderVal = document.getElementById('folderOtdr').value.trim(); if (!folderVal) folderVal = `OTDR - ${lokasiVal} - ${otbVal}`;
 
@@ -1330,7 +1334,7 @@
             e.preventDefault(); 
             if (!isAdmin) return showToast('Akses ditolak', 'error');
             setBtnState('submitEditOtdrBtn', true);
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const updated = { nama_folder: document.getElementById('editOtdrFolder').value, nama_otb: document.getElementById('editOtdrOtb').value, lokasi: document.getElementById('editOtdrLokasi').value };
             try {
                 const res = await fetchAPI('updateOTDRData', { originalData: originalSelectedOTDR, updatedData: updated, email: session.email });
@@ -1346,7 +1350,7 @@
             e.preventDefault(); 
             if (!isAdmin) return showToast('Akses ditolak', 'error');
             setBtnState('submitEditOtdrFolderBtn', true);
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             const newFolderName = document.getElementById('editOtdrFolderNewName').value;
             try {
                 const res = await fetchAPI('updateOTDRFolder', { oldFolderName: originalSelectedOTDRFolder, newFolderName, email: session.email });
@@ -1366,7 +1370,7 @@
 
         async function executeDeleteData() {
             if (!isAdmin) return showToast('Akses Ditolak', 'error');
-            const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+            const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
             setBtnState('confirmDeleteBtn', true);
             try {
                 let res;
@@ -1402,7 +1406,7 @@
             container.innerHTML = '<div class="text-center py-8 text-emerald-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
             
             try {
-                const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
                 let rawData = await fetchAPI('getLocations', { email: session.email });
                 
                 if (typeof rawData === 'string') { try { rawData = JSON.parse(rawData); } catch(e){} }
@@ -1447,7 +1451,7 @@
             container.innerHTML = '<div class="text-center py-8 text-blue-400"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>';
             
             try {
-                const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
                 let rawData = await fetchAPI('getActivityLogs', { email: session.email });
                 
                 if (typeof rawData === 'string') { try { rawData = JSON.parse(rawData); } catch(e){} }
@@ -1594,7 +1598,7 @@
                 if (!isAdmin) return showToast('Akses Ditolak', 'error');
                 if (this.results.length === 0) return;
                 setBtnState('btnSaveSOR', true, '<i class="fa-solid fa-database mr-2"></i> Simpan Ekstraksi ke Database Master');
-                const session = JSON.parse(sessionStorage.getItem('netcore_session') || '{}');
+                const session = JSON.parse(localStorage.getItem('netcore_session') || '{}');
                 try {
                     const res = await fetchAPI('saveBatchSOR', { sorArray: this.results, email: session.email || 'admin@netcore.co.id' });
                     if (res.success) { showToast(res.message, 'success'); document.getElementById('btnSaveSOR').classList.add('hidden'); } else showToast('Gagal menyimpan: ' + res.message, 'error');
@@ -1606,3 +1610,4 @@
     </script>
 </body>
 </html>
+```eof
