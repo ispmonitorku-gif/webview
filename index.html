@@ -14,6 +14,43 @@
     
     <!-- Library Chart Profesional -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- ==========================================
+         SISTEM PROTEKSI FRONTEND (ANTI INSPECT/F12)
+         ========================================== -->
+    <script>
+        (function() {
+            // 1. Mematikan Klik Kanan (Context Menu)
+            document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, false);
+
+            // 2. Mematikan Kombinasi Tombol Keyboard (F12, Ctrl+Shift+I/J/C, Ctrl+U, dll)
+            document.addEventListener('keydown', function(e) {
+                // F12
+                if (e.key === 'F12' || e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I / J / C (DevTools)
+                if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (View Source), Ctrl+S (Save), Ctrl+P (Print)
+                if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's' || e.key === 'P' || e.key === 'p')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // 3. Deteksi Paksa Debugger (Looping perlambat dev-tools jika dipaksa buka)
+            setInterval(function() {
+                try {
+                    (function() { return false; }['constructor']('debugger')());
+                } catch (err) {}
+            }, 2000); // Trigger anti-debugger setiap 2 detik
+        })();
+    </script>
+    <!-- ========================================== -->
     
     <script>
         tailwind.config = {
@@ -37,7 +74,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
         * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #f4f4f5; overscroll-behavior-y: none; overflow-x: hidden; width: 100vw; margin: 0; padding: 0; }
+        /* Ditambahkan user-select: none untuk mencegah teks diblok/dicopy */
+        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #f4f4f5; overscroll-behavior-y: none; overflow-x: hidden; width: 100vw; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
         .app-bg {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -10;
@@ -70,7 +108,8 @@
         .modal-filter-btn.inactive:hover { color: #e4e4e7; }
     </style>
 </head>
-<body class="antialiased selection:bg-brand-500 selection:text-white">
+<!-- Ditambahkan oncontextmenu="return false;" untuk mengunci klik kanan dari body -->
+<body class="antialiased selection:bg-brand-500 selection:text-white" oncontextmenu="return false;">
 
     <div class="app-bg"></div>
     <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none w-[90%] max-w-sm"></div>
